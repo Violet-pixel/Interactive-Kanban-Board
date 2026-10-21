@@ -1,0 +1,21 @@
+{
+  "name": "prumo",
+  "version": "1.0.0",
+  "description": "Quadro Kanban interativo em JavaScript com Drag and Drop nativo, automações, limites WIP, métricas de fluxo e API REST em Django.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "author": "Clara Portes",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Violet-star/Interactive-Kanban-Board.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test tests/js/*.test.js",
+    "servir": "node scripts/servir.js",
+    "relatorio": "node scripts/relatorio.js"
+  }
+}

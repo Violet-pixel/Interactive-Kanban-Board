@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - ".github/atividade.txt"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  javascript:
+    name: Núcleo (JavaScript)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Testes do núcleo
+        run: npm test
+      - name: Relatório do quadro de exemplo
+        run: npm run relatorio -- exemplos/lancamento.json
+
+  django:
+    name: API (Django + PostgreSQL)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: prumo
+          POSTGRES_USER: prumo
+          POSTGRES_PASSWORD: prumo
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U prumo"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      PRUMO_DB_ENGINE: postgresql
+      PRUMO_DB_HOST: localhost
+      PRUMO_DB_NAME: prumo
+      PRUMO_DB_USER: prumo
+      PRUMO_DB_PASSWORD: prumo
+      PRUMO_MEDIA_ROOT: /tmp/prumo-anexos
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Verificar migrações
+        run: python manage.py makemigrations --check --dry-run
+      - name: Testes da API e do WebSocket
+        run: python manage.py test prumo -v 2
+
+  java:
+    name: Ferramenta (Java)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Testes da linha de comando
+        run: bash ferramentas/java/testar.sh
+
+  docker:
+    name: Imagem Docker
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - run: cp .env.example .env
+      - run: docker compose config -q
+      - name: Construir a imagem
+        run: docker build -t prumo:ci .

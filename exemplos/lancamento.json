@@ -1,0 +1,560 @@
+{
+  "formato": "prumo",
+  "versao": 1,
+  "referencia": "2026-10-21",
+  "quadros": [
+    {
+      "id": "qdr_demonstracao",
+      "nome": "Lançamento do aplicativo",
+      "descricao": "Quadro de exemplo com dados fictícios para explorar o Prumo.",
+      "cor": "#707645",
+      "modelo": "kanban",
+      "arquivado": false,
+      "criadoEm": "2026-09-21T13:00:00.000Z",
+      "atualizadoEm": "2026-10-21T20:21:13.927Z",
+      "bloquearDependencias": true,
+      "colunas": [
+        {
+          "id": "col_4fd7a2fc51e9",
+          "nome": "Backlog",
+          "tipo": "espera",
+          "limiteWip": 0
+        },
+        {
+          "id": "col_b73a34327804",
+          "nome": "To Do",
+          "tipo": "espera",
+          "limiteWip": 0
+        },
+        {
+          "id": "col_fe60f84a63ac",
+          "nome": "In Progress",
+          "tipo": "andamento",
+          "limiteWip": 3
+        },
+        {
+          "id": "col_268bbdffe37d",
+          "nome": "Review",
+          "tipo": "andamento",
+          "limiteWip": 2
+        },
+        {
+          "id": "col_0fe13d087f51",
+          "nome": "Done",
+          "tipo": "concluido",
+          "limiteWip": 0
+        }
+      ],
+      "cards": [
+        {
+          "id": "crd_97a611d31f16",
+          "colunaId": "col_0fe13d087f51",
+          "ordem": 0,
+          "titulo": "Tela de login com validação",
+          "descricao": "",
+          "responsavel": "Carla Dias",
+          "prioridade": "alta",
+          "etiquetas": [
+            "etq_3a356292f748"
+          ],
+          "prazo": "",
+          "inicio": "",
+          "subtarefas": [
+            {
+              "id": "sub_1e8ae7cc458b",
+              "texto": "Formulário",
+              "feito": true
+            },
+            {
+              "id": "sub_63cc1de10588",
+              "texto": "Mensagens de erro",
+              "feito": true
+            }
+          ],
+          "comentarios": [],
+          "anexos": [],
+          "dependencias": [],
+          "criadoEm": "2026-09-21T13:00:00.000Z",
+          "iniciadoEm": "2026-09-25T13:00:00.000Z",
+          "concluidoEm": "2026-09-30T19:00:00.000Z",
+          "movimentos": [
+            {
+              "de": "col_4fd7a2fc51e9",
+              "para": "col_fe60f84a63ac",
+              "em": "2026-09-25T13:00:00.000Z"
+            },
+            {
+              "de": "col_fe60f84a63ac",
+              "para": "col_0fe13d087f51",
+              "em": "2026-09-30T19:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "crd_3945233c4e10",
+          "colunaId": "col_0fe13d087f51",
+          "ordem": 0,
+          "titulo": "Modelar tabelas de pedidos",
+          "descricao": "",
+          "responsavel": "Diego Rocha",
+          "prioridade": "media",
+          "etiquetas": [
+            "etq_3a356292f748"
+          ],
+          "prazo": "",
+          "inicio": "",
+          "subtarefas": [],
+          "comentarios": [],
+          "anexos": [],
+          "dependencias": [],
+          "criadoEm": "2026-09-23T13:00:00.000Z",
+          "iniciadoEm": "2026-09-27T13:00:00.000Z",
+          "concluidoEm": "2026-10-03T19:00:00.000Z",
+          "movimentos": [
+            {
+              "de": "col_4fd7a2fc51e9",
+              "para": "col_fe60f84a63ac",
+              "em": "2026-09-27T13:00:00.000Z"
+            },
+            {
+              "de": "col_fe60f84a63ac",
+              "para": "col_0fe13d087f51",
+              "em": "2026-10-03T19:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "crd_c79c6a04be7d",
+          "colunaId": "col_0fe13d087f51",
+          "ordem": 0,
+          "titulo": "Pipeline de integração contínua",
+          "descricao": "",
+          "responsavel": "Bruno Lima",
+          "prioridade": "baixa",
+          "etiquetas": [],
+          "prazo": "",
+          "inicio": "",
+          "subtarefas": [],
+          "comentarios": [],
+          "anexos": [],
+          "dependencias": [],
+          "criadoEm": "2026-09-26T13:00:00.000Z",
+          "iniciadoEm": "2026-10-01T13:00:00.000Z",
+          "concluidoEm": "2026-10-09T19:00:00.000Z",
+          "movimentos": [
+            {
+              "de": "col_4fd7a2fc51e9",
+              "para": "col_fe60f84a63ac",
+              "em": "2026-10-01T13:00:00.000Z"
+            },
+            {
+              "de": "col_fe60f84a63ac",
+              "para": "col_0fe13d087f51",
+              "em": "2026-10-09T19:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "crd_735a276ba6aa",
+          "colunaId": "col_0fe13d087f51",
+          "ordem": 0,
+          "titulo": "Guia de instalação",
+          "descricao": "",
+          "responsavel": "Ana Souza",
+          "prioridade": "media",
+          "etiquetas": [
+            "etq_21fdc8c25dbc"
+          ],
+          "prazo": "",
+          "inicio": "",
+          "subtarefas": [],
+          "comentarios": [],
+          "anexos": [],
+          "dependencias": [],
+          "criadoEm": "2026-10-01T13:00:00.000Z",
+          "iniciadoEm": "2026-10-09T13:00:00.000Z",
+          "concluidoEm": "2026-10-15T19:00:00.000Z",
+          "movimentos": [
+            {
+              "de": "col_4fd7a2fc51e9",
+              "para": "col_fe60f84a63ac",
+              "em": "2026-10-09T13:00:00.000Z"
+            },
+            {
+              "de": "col_fe60f84a63ac",
+              "para": "col_0fe13d087f51",
+              "em": "2026-10-15T19:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "crd_3305f5144297",
+          "colunaId": "col_0fe13d087f51",
+          "ordem": 0,
+          "titulo": "Notificações push",
+          "descricao": "",
+          "responsavel": "Carla Dias",
+          "prioridade": "media",
+          "etiquetas": [
+            "etq_3a356292f748"
+          ],
+          "prazo": "",
+          "inicio": "",
+          "subtarefas": [],
+          "comentarios": [],
+          "anexos": [],
+          "dependencias": [],
+          "criadoEm": "2026-10-06T13:00:00.000Z",
+          "iniciadoEm": "2026-10-12T13:00:00.000Z",
+          "concluidoEm": "2026-10-19T19:00:00.000Z",
+          "movimentos": [
+            {
+              "de": "col_4fd7a2fc51e9",
+              "para": "col_fe60f84a63ac",
+              "em": "2026-10-12T13:00:00.000Z"
+            },
+            {
+              "de": "col_fe60f84a63ac",
+              "para": "col_0fe13d087f51",
+              "em": "2026-10-19T19:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "crd_6d26380d6550",
+          "colunaId": "col_268bbdffe37d",
+          "ordem": 0,
+          "titulo": "Integração com gateway de pagamento",
+          "descricao": "",
+          "responsavel": "Diego Rocha",
+          "prioridade": "urgente",
+          "etiquetas": [
+            "etq_3a356292f748"
+          ],
+          "prazo": "2026-10-22",
+          "inicio": "",
+          "subtarefas": [
+            {
+              "id": "sub_b949cb04f444",
+              "texto": "Sandbox",
+              "feito": true
+            },
+            {
+              "id": "sub_55e0c6ed1e96",
+              "texto": "Webhooks",
+              "feito": true
+            },
+            {
+              "id": "sub_0bf5436d1b26",
+              "texto": "Reembolso",
+              "feito": false
+            }
+          ],
+          "comentarios": [
+            {
+              "id": "cmt_90838d3abee5",
+              "autor": "Bruno Lima",
+              "texto": "@Diego confira os webhooks de estorno antes de liberar.",
+              "em": "2026-10-20T17:00:00.000Z"
+            }
+          ],
+          "anexos": [],
+          "dependencias": [],
+          "criadoEm": "2026-10-09T13:00:00.000Z",
+          "iniciadoEm": "2026-10-14T13:00:00.000Z",
+          "concluidoEm": null,
+          "movimentos": [
+            {
+              "de": "col_4fd7a2fc51e9",
+              "para": "col_268bbdffe37d",
+              "em": "2026-10-14T13:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "crd_6430972602ed",
+          "colunaId": "col_fe60f84a63ac",
+          "ordem": 0,
+          "titulo": "Corrigir travamento no Android 12",
+          "descricao": "",
+          "responsavel": "Carla Dias",
+          "prioridade": "urgente",
+          "etiquetas": [
+            "etq_5cfbb8a9002f"
+          ],
+          "prazo": "2026-10-19",
+          "inicio": "",
+          "subtarefas": [
+            {
+              "id": "sub_f674583924e8",
+              "texto": "Reproduzir",
+              "feito": true
+            },
+            {
+              "id": "sub_0ec6b83509da",
+              "texto": "Corrigir",
+              "feito": false
+            },
+            {
+              "id": "sub_8070d8d3aebf",
+              "texto": "Testar em 3 aparelhos",
+              "feito": false
+            }
+          ],
+          "comentarios": [],
+          "anexos": [],
+          "dependencias": [],
+          "criadoEm": "2026-10-15T13:00:00.000Z",
+          "iniciadoEm": "2026-10-17T13:00:00.000Z",
+          "concluidoEm": null,
+          "movimentos": [
+            {
+              "de": "col_4fd7a2fc51e9",
+              "para": "col_fe60f84a63ac",
+              "em": "2026-10-17T13:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "crd_2da51d80aa60",
+          "colunaId": "col_fe60f84a63ac",
+          "ordem": 0,
+          "titulo": "Busca de produtos com filtros",
+          "descricao": "",
+          "responsavel": "Ana Souza",
+          "prioridade": "alta",
+          "etiquetas": [
+            "etq_3a356292f748"
+          ],
+          "prazo": "2026-10-25",
+          "inicio": "",
+          "subtarefas": [],
+          "comentarios": [],
+          "anexos": [],
+          "dependencias": [],
+          "criadoEm": "2026-10-12T13:00:00.000Z",
+          "iniciadoEm": "2026-10-18T13:00:00.000Z",
+          "concluidoEm": null,
+          "movimentos": [
+            {
+              "de": "col_4fd7a2fc51e9",
+              "para": "col_fe60f84a63ac",
+              "em": "2026-10-18T13:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "crd_03c07548bd73",
+          "colunaId": "col_b73a34327804",
+          "ordem": 0,
+          "titulo": "Publicar na loja de aplicativos",
+          "descricao": "",
+          "responsavel": "Bruno Lima",
+          "prioridade": "alta",
+          "etiquetas": [],
+          "prazo": "2026-10-30",
+          "inicio": "",
+          "subtarefas": [
+            {
+              "id": "sub_305b986f509c",
+              "texto": "Capturas de tela",
+              "feito": false
+            },
+            {
+              "id": "sub_d79e116870e0",
+              "texto": "Política de privacidade",
+              "feito": false
+            },
+            {
+              "id": "sub_642b57627dff",
+              "texto": "Descrição",
+              "feito": false
+            }
+          ],
+          "comentarios": [],
+          "anexos": [],
+          "dependencias": [
+            "crd_6d26380d6550",
+            "crd_6430972602ed"
+          ],
+          "criadoEm": "2026-10-16T13:00:00.000Z",
+          "iniciadoEm": null,
+          "concluidoEm": null,
+          "movimentos": []
+        },
+        {
+          "id": "crd_72c89f498ee2",
+          "colunaId": "col_b73a34327804",
+          "ordem": 0,
+          "titulo": "Revisão de acessibilidade",
+          "descricao": "",
+          "responsavel": "Eva Martins",
+          "prioridade": "media",
+          "etiquetas": [
+            "etq_b216e67f1791"
+          ],
+          "prazo": "2026-10-27",
+          "inicio": "",
+          "subtarefas": [],
+          "comentarios": [],
+          "anexos": [],
+          "dependencias": [],
+          "criadoEm": "2026-10-17T13:00:00.000Z",
+          "iniciadoEm": null,
+          "concluidoEm": null,
+          "movimentos": []
+        },
+        {
+          "id": "crd_4ebee970a2d1",
+          "colunaId": "col_4fd7a2fc51e9",
+          "ordem": 0,
+          "titulo": "Documentar a API pública",
+          "descricao": "",
+          "responsavel": "",
+          "prioridade": "baixa",
+          "etiquetas": [
+            "etq_21fdc8c25dbc"
+          ],
+          "prazo": "",
+          "inicio": "",
+          "subtarefas": [],
+          "comentarios": [],
+          "anexos": [],
+          "dependencias": [],
+          "criadoEm": "2026-10-18T13:00:00.000Z",
+          "iniciadoEm": null,
+          "concluidoEm": null,
+          "movimentos": []
+        },
+        {
+          "id": "crd_28dc96774552",
+          "colunaId": "col_4fd7a2fc51e9",
+          "ordem": 0,
+          "titulo": "Modo offline",
+          "descricao": "Avaliar sincronização com fila local.",
+          "responsavel": "",
+          "prioridade": "media",
+          "etiquetas": [
+            "etq_b216e67f1791"
+          ],
+          "prazo": "",
+          "inicio": "",
+          "subtarefas": [],
+          "comentarios": [],
+          "anexos": [],
+          "dependencias": [],
+          "criadoEm": "2026-10-19T13:00:00.000Z",
+          "iniciadoEm": null,
+          "concluidoEm": null,
+          "movimentos": []
+        }
+      ],
+      "etiquetas": [
+        {
+          "id": "etq_5cfbb8a9002f",
+          "nome": "Bug",
+          "cor": "#6B1F33"
+        },
+        {
+          "id": "etq_3a356292f748",
+          "nome": "Melhoria",
+          "cor": "#707645"
+        },
+        {
+          "id": "etq_21fdc8c25dbc",
+          "nome": "Documentação",
+          "cor": "#A4978B"
+        },
+        {
+          "id": "etq_b216e67f1791",
+          "nome": "Pesquisa",
+          "cor": "#F6E4A6"
+        }
+      ],
+      "automacoes": [
+        {
+          "id": "aut_df5ea5f45ea7",
+          "nome": "Revisão vai para o Bruno",
+          "ativa": true,
+          "gatilho": {
+            "tipo": "entrar",
+            "colunaId": "col_268bbdffe37d"
+          },
+          "acao": {
+            "tipo": "atribuir",
+            "valor": "Bruno Lima"
+          }
+        },
+        {
+          "id": "aut_8908b484673f",
+          "nome": "Concluir marca subtarefas",
+          "ativa": true,
+          "gatilho": {
+            "tipo": "entrar",
+            "colunaId": "col_0fe13d087f51"
+          },
+          "acao": {
+            "tipo": "concluir_subtarefas",
+            "valor": ""
+          }
+        }
+      ],
+      "historico": [
+        {
+          "id": "reg_6a94955eb0b0",
+          "em": "2026-10-20T17:00:00.000Z",
+          "autor": "Bruno Lima",
+          "acao": "comentou",
+          "detalhe": "Integração com gateway de pagamento",
+          "cardId": "crd_6d26380d6550"
+        },
+        {
+          "id": "reg_e217aa09952a",
+          "em": "2026-10-19T19:00:00.000Z",
+          "autor": "Carla Dias",
+          "acao": "moveu",
+          "detalhe": "Notificações push: In Progress → Done",
+          "cardId": "crd_3305f5144297"
+        },
+        {
+          "id": "reg_a954a469f976",
+          "em": "2026-10-17T13:00:00.000Z",
+          "autor": "Carla Dias",
+          "acao": "moveu",
+          "detalhe": "Corrigir travamento no Android 12: Backlog → In Progress",
+          "cardId": "crd_6430972602ed"
+        },
+        {
+          "id": "reg_f80f998378e6",
+          "em": "2026-09-21T13:00:00.000Z",
+          "autor": "Ana Souza",
+          "acao": "criou o quadro",
+          "detalhe": "Lançamento do aplicativo",
+          "cardId": null
+        }
+      ],
+      "membros": [
+        {
+          "nome": "Ana Souza",
+          "papel": "admin"
+        },
+        {
+          "nome": "Bruno Lima",
+          "papel": "gerente"
+        },
+        {
+          "nome": "Carla Dias",
+          "papel": "membro"
+        },
+        {
+          "nome": "Diego Rocha",
+          "papel": "membro"
+        },
+        {
+          "nome": "Eva Martins",
+          "papel": "visualizador"
+        }
+      ]
+    }
+  ]
+}

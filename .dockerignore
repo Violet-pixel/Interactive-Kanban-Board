@@ -1,0 +1,13 @@
+.git
+.github
+.env
+.venv
+__pycache__
+*.pyc
+prumo.sqlite3
+anexos
+docs
+tests
+ferramentas
+node_modules
+*.pdf

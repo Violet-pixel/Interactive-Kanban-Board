@@ -1,0 +1,49 @@
+name: prumo
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${PRUMO_DB_NAME:-prumo}
+      POSTGRES_USER: ${PRUMO_DB_USER:-prumo}
+      POSTGRES_PASSWORD: ${PRUMO_DB_PASSWORD:?Defina PRUMO_DB_PASSWORD no arquivo .env}
+    volumes:
+      - dados-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PRUMO_DEBUG: "false"
+      PRUMO_SECRET_KEY: ${PRUMO_SECRET_KEY:?Defina PRUMO_SECRET_KEY no arquivo .env}
+      PRUMO_ALLOWED_HOSTS: ${PRUMO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      PRUMO_CSRF_TRUSTED_ORIGINS: ${PRUMO_CSRF_TRUSTED_ORIGINS:-}
+      PRUMO_HTTPS: ${PRUMO_HTTPS:-false}
+      PRUMO_SEED: ${PRUMO_SEED:-true}
+      PRUMO_TIMEZONE: ${PRUMO_TIMEZONE:-America/Sao_Paulo}
+      PRUMO_MAX_ANEXO_MB: ${PRUMO_MAX_ANEXO_MB:-20}
+      PRUMO_TOKEN_HORAS: ${PRUMO_TOKEN_HORAS:-168}
+      PRUMO_REDIS_URL: ${PRUMO_REDIS_URL:-}
+      PRUMO_DB_ENGINE: postgresql
+      PRUMO_DB_HOST: postgres
+      PRUMO_DB_PORT: "5432"
+      PRUMO_DB_NAME: ${PRUMO_DB_NAME:-prumo}
+      PRUMO_DB_USER: ${PRUMO_DB_USER:-prumo}
+      PRUMO_DB_PASSWORD: ${PRUMO_DB_PASSWORD}
+    volumes:
+      - anexos:/dados/anexos
+    ports:
+      - "${PRUMO_PORT:-8080}:8000"
+
+volumes:
+  dados-postgres:
+  anexos:
