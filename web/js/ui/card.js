@@ -1,4 +1,4 @@
-import { html, seguro, icone, avisar, abrirDialogo, confirmar, lerArquivoUrl } from './dom.js';
+import { html, seguro, icone, avisar, abrirDialogo, confirmar, lerArquivoUrl, corExibida, nomeCor } from './dom.js';
 import { cardDe, colunaDe, editarCard, moverCard, excluirCard, duplicarCard, criaCiclo, registrar, progressoSubtarefas, dependenciasPendentes, estaConcluido } from '../regras.js';
 import { responsaveisDo, situacaoPrazo } from '../filtros.js';
 import { PRIORIDADES, uid, agora, formatarDataHora, formatarBytes, CORES_ETIQUETA } from '../util.js';
@@ -51,7 +51,7 @@ const corpoCard = (quadro, card, papel) => {
 
       <section class="bloco">
         <div class="bloco-topo"><h3>Histórico da tarefa</h3></div>
-        <ol class="linha-tempo">${historico.map((h) => html`<li><strong>${h.autor}</strong> ${h.acao} <span class="discreto">· ${formatarDataHora(h.em)}</span><br><span class="discreto">${h.detalhe}</span></li>`)}</ol>
+        <ol class="linha-tempo">${historico.map((h) => html`<li><strong>${h.autor}</strong> ${h.acao} <span class="discreto">em ${formatarDataHora(h.em)}</span><br><span class="discreto">${h.detalhe}</span></li>`)}</ol>
       </section>
     </div>
 
@@ -62,8 +62,8 @@ const corpoCard = (quadro, card, papel) => {
       <label class="campo"><span>Início</span><input id="cd-inicio" type="date" data-campo="inicio" value="${card.inicio}" ${des}></label>
       <label class="campo"><span>Prazo ${prazo === 'atrasado' ? html`<em class="texto-alerta">atrasada</em>` : ''}</span><input id="cd-prazo" type="date" data-campo="prazo" value="${card.prazo}" ${des}></label>
       <div class="campo"><span>Etiquetas</span>
-        <div class="etiquetas-escolha">${quadro.etiquetas.map((e) => html`<button type="button" class="etiqueta ${card.etiquetas.includes(e.id) ? 'ativa' : 'inativa'}" style="--cor:${e.cor}" data-etiqueta="${e.id}" ${des}>${e.nome}</button>`)}</div>
-        ${pode(papel, 'configurar') ? html`<form class="linha-form" data-form-etiqueta><input id="cd-nova-etiqueta" placeholder="Nova etiqueta" maxlength="30"><select id="cd-cor-etiqueta" aria-label="Cor">${CORES_ETIQUETA.map((c) => html`<option value="${c}">${c}</option>`)}</select><button class="botao pequeno">Criar</button></form>` : ''}
+        <div class="etiquetas-escolha">${quadro.etiquetas.map((e) => html`<button type="button" class="etiqueta ${card.etiquetas.includes(e.id) ? 'ativa' : 'inativa'}" style="--cor:${corExibida(e.cor)}" data-etiqueta="${e.id}" ${des}>${e.nome}</button>`)}</div>
+        ${pode(papel, 'configurar') ? html`<form class="linha-form" data-form-etiqueta><input id="cd-nova-etiqueta" placeholder="Nova etiqueta" maxlength="30"><select id="cd-cor-etiqueta" aria-label="Cor">${CORES_ETIQUETA.map((c) => html`<option value="${c}">${nomeCor(c)}</option>`)}</select><button class="botao pequeno">Criar</button></form>` : ''}
       </div>
       <dl class="datas">
         <dt>Criada</dt><dd>${formatarDataHora(card.criadoEm)}</dd>

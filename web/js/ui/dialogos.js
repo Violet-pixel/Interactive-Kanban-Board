@@ -1,4 +1,4 @@
-import { html, seguro, icone, avisar, abrirDialogo, confirmar, baixarArquivo, lerArquivoTexto } from './dom.js';
+import { html, seguro, icone, avisar, abrirDialogo, confirmar, baixarArquivo, lerArquivoTexto, corExibida, nomeCor } from './dom.js';
 import { MODELOS } from '../modelos.js';
 import { DESCRICOES_ACAO, registrar, colunaDe } from '../regras.js';
 import { PRIORIDADES, uid, dataIso, CORES_ETIQUETA, nomePrioridade } from '../util.js';
@@ -12,7 +12,7 @@ export const dialogoNovoQuadro = (ctx) => {
       <label class="campo"><span>Nome</span><input id="nq-nome" name="nome" required maxlength="80" placeholder="Ex.: Sprint 14"></label>
       <label class="campo"><span>Descrição</span><input id="nq-descricao" name="descricao" maxlength="200"></label>
       <fieldset class="modelos"><legend>Modelo</legend>${Object.entries(MODELOS).map(([id, m], i) => html`<label class="modelo"><input type="radio" name="modelo" value="${id}" ${seguro(i === 0 ? 'checked' : '')}><span><strong>${m.nome}</strong><small>${m.descricao}</small></span></label>`)}</fieldset>
-      <label class="campo"><span>Cor</span><select id="nq-cor" name="cor">${CORES_ETIQUETA.map((c) => html`<option value="${c}">${c}</option>`)}</select></label>
+      <label class="campo"><span>Cor</span><select id="nq-cor" name="cor">${CORES_ETIQUETA.map((c) => html`<option value="${c}">${nomeCor(c)}</option>`)}</select></label>
       <div class="acoes-dialogo"><button type="button" class="botao" data-fechar>Cancelar</button><button class="botao botao-primario">Criar quadro</button></div>
     </form>`,
     aoAbrir: (d, fechar) => {
@@ -36,10 +36,10 @@ export const dialogoEditarQuadro = (ctx) => {
     corpo: html`<form class="formulario" data-form>
       <label class="campo"><span>Nome</span><input id="eq-nome" name="nome" value="${q.nome}" required maxlength="80"></label>
       <label class="campo"><span>Descrição</span><textarea id="eq-descricao" name="descricao" rows="2" maxlength="200">${q.descricao}</textarea></label>
-      <label class="campo"><span>Cor</span><select id="eq-cor" name="cor">${CORES_ETIQUETA.map((c) => html`<option value="${c}" ${seguro(c === q.cor ? 'selected' : '')}>${c}</option>`)}</select></label>
+      <label class="campo"><span>Cor</span><select id="eq-cor" name="cor">${CORES_ETIQUETA.map((c) => html`<option value="${c}" ${seguro(c === q.cor ? 'selected' : '')}>${nomeCor(c)}</option>`)}</select></label>
       <label class="opcao"><input type="checkbox" id="eq-bloquear" name="bloquear" ${seguro(q.bloquearDependencias ? 'checked' : '')}><span>Impedir que tarefas avancem antes das dependências serem concluídas (desmarcado: só avisa)</span></label>
       <section class="bloco"><div class="bloco-topo"><h3>Etiquetas</h3></div>
-        <ul class="lista-edicao">${q.etiquetas.map((e) => html`<li><span class="etiqueta ativa" style="--cor:${e.cor}">${e.nome}</span><select data-cor-etiqueta="${e.id}" aria-label="Cor de ${e.nome}">${CORES_ETIQUETA.map((c) => html`<option value="${c}" ${seguro(c === e.cor ? 'selected' : '')}>${c}</option>`)}</select><button type="button" class="botao-icone pequeno" data-excluir-etiqueta="${e.id}" aria-label="Excluir ${e.nome}">${icone('fechar')}</button></li>`)}</ul>
+        <ul class="lista-edicao">${q.etiquetas.map((e) => html`<li><span class="etiqueta ativa" style="--cor:${corExibida(e.cor)}">${e.nome}</span><select data-cor-etiqueta="${e.id}" aria-label="Cor de ${e.nome}">${CORES_ETIQUETA.map((c) => html`<option value="${c}" ${seguro(c === e.cor ? 'selected' : '')}>${nomeCor(c)}</option>`)}</select><button type="button" class="botao-icone pequeno" data-excluir-etiqueta="${e.id}" aria-label="Excluir ${e.nome}">${icone('fechar')}</button></li>`)}</ul>
       </section>
       <div class="acoes-dialogo separadas">
         <span>${podeExcluir ? html`<button type="button" class="botao botao-perigo" data-excluir>Excluir quadro</button>` : ''} <button type="button" class="botao" data-duplicar>Duplicar</button> <button type="button" class="botao" data-arquivar>${q.arquivado ? 'Restaurar' : 'Arquivar'}</button></span>

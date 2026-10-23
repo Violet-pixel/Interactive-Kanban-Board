@@ -15,6 +15,22 @@ const converter = (v) => {
 
 export const html = (partes, ...valores) => seguro(partes.reduce((s, p, i) => s + converter(valores[i - 1]) + p));
 
+// Cores antigas (1.0) continuam salvas nos quadros; na tela elas viram a paleta do canteiro.
+const CORES_1_1 = {
+  '#707645': ['#2D5DA6', 'Azul linha de giz'],
+  '#8C8C7A': ['#7D8791', 'Cinza concreto'],
+  '#A4978B': ['#5B636C', 'Grafite claro'],
+  '#5C4033': ['#23272C', 'Grafite'],
+  '#D6BDB8': ['#5E9A3A', 'Verde bolha'],
+  '#F6E4A6': ['#B8862C', 'Latão'],
+  '#6B1F33': ['#B23A32', 'Vermelho'],
+  '#3E4A2C': ['#2F7A6B', 'Verde azulado']
+};
+
+export const corExibida = (cor) => CORES_1_1[String(cor ?? '').toUpperCase()]?.[0] ?? cor;
+
+export const nomeCor = (cor) => CORES_1_1[String(cor ?? '').toUpperCase()]?.[1] ?? cor;
+
 export const LOGO = '<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="13" y="13" width="74" height="74" fill="none" stroke="currentColor" stroke-width="6"/><rect x="47" y="13" width="6" height="74" fill="currentColor"/><rect x="22" y="26" width="18" height="8" fill="currentColor"/><rect x="22" y="42" width="18" height="8" fill="currentColor"/><rect x="22" y="58" width="12" height="8" fill="currentColor"/><path d="M60 52l8 9 13-20" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="square"/></svg>';
 
 export const ICONES = {

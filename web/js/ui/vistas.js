@@ -37,10 +37,10 @@ export const renderizarCalendario = (alvo, ctx) => {
       <h2>${MESES[ref.getMonth()]} ${ref.getFullYear()}</h2>
       <button class="botao pequeno" data-mes="1" aria-label="Próximo mês">›</button>
       <button class="botao pequeno" data-mes="0">Hoje</button>
-      <span class="discreto">${atrasadas.length} atrasada(s) · ${cards.length} com prazo · ${semPrazo.length} pendente(s) sem prazo</span>
+      <p class="resumo-calendario discreto"><span class="${atrasadas.length ? 'com-atraso' : ''}"><strong>${atrasadas.length}</strong> atrasada(s)</span><span><strong>${cards.length}</strong> com prazo</span><span><strong>${semPrazo.length}</strong> pendente(s) sem prazo</span></p>
     </div>
     <div class="grade-mes">${DIAS.map((d) => html`<div class="dia-semana">${d}</div>`)}${celulas}</div>
-    ${atrasadas.length ? html`<section class="lista-atrasadas"><h3>Atrasadas</h3><ul>${atrasadas.sort((a, b) => a.prazo.localeCompare(b.prazo)).map((c) => html`<li><button class="link" data-card="${c.id}">${c.titulo}</button> <span class="discreto">venceu em ${lerDataLocal(c.prazo).toLocaleDateString('pt-BR')} · ${c.responsavel || 'sem responsável'} · ${colunaDe(quadro, c.colunaId)?.nome}</span></li>`)}</ul></section>` : ''}
+    ${atrasadas.length ? html`<section class="lista-atrasadas"><h3>Atrasadas</h3><ul>${atrasadas.sort((a, b) => a.prazo.localeCompare(b.prazo)).map((c) => html`<li><button class="link" data-card="${c.id}">${c.titulo}</button> <span class="discreto">venceu em ${lerDataLocal(c.prazo).toLocaleDateString('pt-BR')}, ${c.responsavel || 'sem responsável'}, em ${colunaDe(quadro, c.colunaId)?.nome}</span></li>`)}</ul></section>` : ''}
   </div>`;
   alvo.querySelector('.calendario').addEventListener('click', (ev) => {
     const mes = ev.target.closest('[data-mes]');
@@ -111,13 +111,13 @@ export const renderizarPainel = (alvo, ctx) => {
       <div class="indicador"><span class="indicador-rotulo">Concluídas</span><strong>${r.concluidas}</strong><span class="discreto">${taxa}% do quadro</span></div>
       <div class="indicador"><span class="indicador-rotulo">Pendentes</span><strong>${r.pendentes}</strong><span class="discreto">${r.andamento} em andamento</span></div>
       <div class="indicador ${r.atrasadas ? 'indicador-alerta' : ''}"><span class="indicador-rotulo">Atrasadas</span><strong>${r.atrasadas}</strong><span class="discreto">prazo vencido</span></div>
-      <div class="indicador"><span class="indicador-rotulo">Lead time</span><strong>${dias(t.leadMediano)}</strong><span class="discreto">mediana · média ${dias(t.leadMedio)}</span></div>
-      <div class="indicador"><span class="indicador-rotulo">Cycle time</span><strong>${dias(t.cicloMediano)}</strong><span class="discreto">mediana · média ${dias(t.cicloMedio)}</span></div>
+      <div class="indicador"><span class="indicador-rotulo">Lead time</span><strong>${dias(t.leadMediano)}</strong><span class="discreto">mediana; média ${dias(t.leadMedio)}</span></div>
+      <div class="indicador"><span class="indicador-rotulo">Cycle time</span><strong>${dias(t.cicloMediano)}</strong><span class="discreto">mediana; média ${dias(t.cicloMedio)}</span></div>
       <div class="indicador"><span class="indicador-rotulo">Throughput</span><strong>${media4.toFixed(1).replace('.', ',')}</strong><span class="discreto">tarefas/semana (4 sem.)</span></div>
     </section>
     <section class="cartao-painel largo"><h3>Concluídas por semana</h3>${graficoVazao(vazao)}</section>
     <section class="cartao-painel"><h3>Tarefas por coluna</h3>${barrasHorizontais(cols.map((c) => ({ nome: c.nome, total: c.total, limite: c.limiteWip, classe: c.limiteWip && c.total >= c.limiteWip ? 'barra-cheia' : `barra-${c.tipo}`, texto: c.limiteWip ? `${c.total}/${c.limiteWip}` : c.total })), Math.max(1, ...cols.map((c) => Math.max(c.total, c.limiteWip || 0))))}</section>
-    <section class="cartao-painel largo"><h3>Fluxo cumulativo · 14 dias</h3>${graficoFluxo(quadro, fluxoCumulativo(quadro))}</section>
+    <section class="cartao-painel largo"><h3>Fluxo cumulativo dos últimos 14 dias</h3>${graficoFluxo(quadro, fluxoCumulativo(quadro))}</section>
     <section class="cartao-painel"><h3>Por responsável</h3>${barrasHorizontais(resp.map((p) => ({ nome: p.nome, total: p.total, texto: `${p.concluidas}/${p.total}` })), Math.max(1, ...resp.map((p) => p.total)))}<p class="discreto">concluídas / total</p></section>
     <section class="cartao-painel"><h3>Pendentes por prioridade</h3>${barrasHorizontais(prio.map((p) => ({ nome: nomePrioridade(p.id), total: p.total, classe: `barra-${p.id}` })), Math.max(1, ...prio.map((p) => p.total)))}</section>
     <section class="cartao-painel"><h3>Como ler</h3><dl class="glossario"><dt>Lead time</dt><dd>da criação até a conclusão.</dd><dt>Cycle time</dt><dd>da primeira etapa “em andamento” até a conclusão.</dd><dt>Throughput</dt><dd>tarefas concluídas por semana.</dd></dl><p class="discreto">${t.amostras} tarefa(s) concluída(s) na amostra.</p></section>
@@ -130,7 +130,7 @@ export const renderizarHistorico = (alvo, ctx) => {
   const itens = quadro.historico.filter((h) => !termo || `${h.autor} ${h.acao} ${h.detalhe}`.toLowerCase().includes(termo));
   const autores = [...new Set(quadro.historico.map((h) => h.autor))];
   alvo.innerHTML = html`<div class="historico">
-    <div class="historico-topo"><h2>Histórico de alterações</h2><span class="discreto">${itens.length} registro(s) · ${autores.length} pessoa(s) · mantém os últimos 500</span></div>
+    <div class="historico-topo"><h2>Histórico de alterações</h2><span class="discreto">${itens.length} registro(s) de ${autores.length} pessoa(s). O quadro guarda os últimos 500.</span></div>
     <ol class="linha-tempo larga">${itens.map((h) => html`<li><span class="hora">${formatarDataHora(h.em)}</span><span><strong>${h.autor}</strong> ${h.acao}${h.cardId && quadro.cards.some((c) => c.id === h.cardId) ? html` <button class="link" data-card="${h.cardId}">${h.detalhe}</button>` : html` <span class="discreto">${h.detalhe}</span>`}</span></li>`)}</ol>
     ${!itens.length ? html`<p class="discreto">Nenhum registro.</p>` : ''}
   </div>`;

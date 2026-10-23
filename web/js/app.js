@@ -4,7 +4,7 @@ import { FILTRO_VAZIO, filtroAtivo, responsaveisDo } from './filtros.js';
 import { gerarNotificacoes } from './notificacoes.js';
 import { pode, nomePapel } from './permissoes.js';
 import { PRIORIDADES, debounce } from './util.js';
-import { $, $$, html, seguro, icone, avisar, abrirDialogo, LOGO } from './ui/dom.js';
+import { $, $$, html, seguro, icone, avisar, abrirDialogo, LOGO, corExibida } from './ui/dom.js';
 import { renderizarQuadro } from './ui/quadro.js';
 import { abrirCard } from './ui/card.js';
 import { renderizarCalendario, renderizarPainel, renderizarHistorico, htmlNotificacoes } from './ui/vistas.js';
@@ -41,14 +41,14 @@ const renderLateral = () => {
   const { quadros, quadroAtivo, preferencias } = loja.estado;
   const ativos = quadros.filter((q) => !q.arquivado);
   const arquivados = quadros.filter((q) => q.arquivado);
-  const item = (q) => html`<li><button class="item-quadro ${q.id === quadroAtivo ? 'ativo' : ''}" data-quadro="${q.id}"><span class="ponto" style="background:${q.cor}"></span><span class="item-nome">${q.nome}</span>${remotos.has(q.id) ? html`<span class="tag-servidor" title="Salvo no servidor">●</span>` : ''}<span class="item-total">${q.cards.length}</span></button></li>`;
+  const item = (q) => html`<li><button class="item-quadro ${q.id === quadroAtivo ? 'ativo' : ''}" data-quadro="${q.id}"><span class="ponto" style="background:${corExibida(q.cor)}"></span><span class="item-nome">${q.nome}</span>${remotos.has(q.id) ? html`<span class="tag-servidor" title="Salvo no servidor">●</span>` : ''}<span class="item-total">${q.cards.length}</span></button></li>`;
   $('#lateral').innerHTML = html`
     <div class="lateral-topo"><h2>Quadros</h2>${pode(loja.estado.usuario.papel, 'quadros') || api.conectado ? html`<button class="botao-icone" data-acao="novo-quadro" aria-label="Novo quadro" title="Novo quadro">${icone('mais')}</button>` : ''}</div>
     <ul class="lista-quadros">${ativos.map(item)}</ul>
     ${arquivados.length ? html`<button class="link alternar-arquivados" data-acao="arquivados">${preferencias.mostrarArquivados ? 'Ocultar' : 'Mostrar'} arquivados (${arquivados.length})</button>${preferencias.mostrarArquivados ? html`<ul class="lista-quadros arquivados">${arquivados.map(item)}</ul>` : ''}` : ''}
     <div class="lateral-rodape">
       ${ctx.presentes.length ? html`<div class="presentes"><span class="discreto">Agora neste quadro</span><div>${ctx.presentes.map((p) => html`<span class="avatar avatar-online" title="${p}">${p.split(' ').map((x) => x[0]).slice(0, 2).join('')}</span>`)}</div></div>` : ''}
-      <button class="conta" data-acao="conta">${icone('usuario')}<span><strong>${api.conectado ? api.sessao.usuario.nome : loja.estado.usuario.nome}</strong><small>${api.conectado ? (ctx.modoServidor() ? `${nomePapel(ctx.papel())} · servidor` : 'Conectado · quadro local') : `${nomePapel(loja.estado.usuario.papel)} · modo local`}</small></span></button>
+      <button class="conta" data-acao="conta">${icone('usuario')}<span><strong>${api.conectado ? api.sessao.usuario.nome : loja.estado.usuario.nome}</strong><small>${api.conectado ? (ctx.modoServidor() ? `${nomePapel(ctx.papel())}, no servidor` : 'Conectado, quadro local') : `${nomePapel(loja.estado.usuario.papel)}, modo local`}</small></span></button>
     </div>`;
 };
 
@@ -127,7 +127,7 @@ const salvarRemoto = debounce(async (id) => {
       const atual = await api.obterQuadro(id).catch(() => null);
       if (atual) { meta.revisao = atual.revisao; loja.substituirQuadroRemoto(atual.dados); }
     } else {
-      $('#estado-sync').textContent = 'Sem conexão · tentando de novo';
+      $('#estado-sync').textContent = 'Sem conexão. Tentando de novo…';
       setTimeout(() => salvarRemoto(id), 5000);
     }
   }

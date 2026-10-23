@@ -1,4 +1,4 @@
-import { html, seguro, icone, avisar, $, $$, pedirTexto, confirmar, abrirDialogo } from './dom.js';
+import { html, seguro, icone, avisar, $, $$, pedirTexto, confirmar, abrirDialogo, corExibida } from './dom.js';
 import { cardsDaColuna, moverCard, adicionarCard, adicionarColuna, moverColuna, excluirColuna, progressoSubtarefas, dependenciasPendentes, estaConcluido, colunaDe, registrar } from '../regras.js';
 import { atendeFiltro, situacaoPrazo, filtroAtivo } from '../filtros.js';
 import { formatarData, nomePrioridade } from '../util.js';
@@ -14,10 +14,10 @@ export const htmlCard = (quadro, card, podeMover) => {
   const prazo = situacaoPrazo(quadro, card);
   const bloqueado = !estaConcluido(quadro, card) && dependenciasPendentes(quadro, card).length > 0;
   return html`<article class="card prioridade-${card.prioridade} ${bloqueado ? 'card-bloqueado' : ''}" data-card="${card.id}" draggable="${podeMover ? 'true' : 'false'}" tabindex="0" aria-label="${card.titulo}">
-    ${etiquetas.length ? html`<div class="card-etiquetas">${etiquetas.map((e) => html`<span class="etiqueta" style="--cor:${e.cor}">${e.nome}</span>`)}</div>` : ''}
+    ${etiquetas.length ? html`<div class="card-etiquetas">${etiquetas.map((e) => html`<span class="etiqueta" style="--cor:${corExibida(e.cor)}">${e.nome}</span>`)}</div>` : ''}
     <h3 class="card-titulo">${card.titulo}</h3>
     <div class="card-meta">
-      ${card.prazo ? html`<span class="selo prazo-${prazo}" title="Prazo">${icone('relogio')}${formatarData(card.prazo)}${ROTULO_PRAZO[prazo] ? html` · ${ROTULO_PRAZO[prazo]}` : ''}</span>` : ''}
+      ${card.prazo ? html`<span class="selo prazo-${prazo}" title="Prazo">${icone('relogio')}${formatarData(card.prazo)}${ROTULO_PRAZO[prazo] ? html` <span class="selo-rotulo">${ROTULO_PRAZO[prazo]}</span>` : ''}</span>` : ''}
       ${prog.total ? html`<span class="selo ${prog.feitas === prog.total ? 'selo-ok' : ''}" title="Subtarefas">${icone('check')}${prog.feitas}/${prog.total}</span>` : ''}
       ${card.comentarios.length ? html`<span class="selo" title="Comentários">${icone('balao')}${card.comentarios.length}</span>` : ''}
       ${card.anexos.length ? html`<span class="selo" title="Anexos">${icone('clipe')}${card.anexos.length}</span>` : ''}
@@ -33,6 +33,18 @@ export const htmlCard = (quadro, card, podeMover) => {
 
 const TIPOS = { espera: 'Espera', andamento: 'Em andamento', concluido: 'Concluído' };
 
+// Nível de bolha: uma marca por vaga do limite WIP; a bolha anda até a marca do total.
+const htmlNivel = (total, limite) => {
+  if (!limite) return html`<p class="sem-limite">Sem limite WIP</p>`;
+  const estado = total >= limite ? 'nivel-cheio' : total === limite - 1 && limite > 1 ? 'nivel-quase' : 'nivel-livre';
+  const numerar = limite <= 8;
+  const marcas = Array.from({ length: limite + 1 }, (_, i) => html`<span class="nivel-marca ${i === limite ? 'limite' : i <= total && i > 0 ? 'cheia' : ''}" style="--i:${i / limite}">${numerar || i === 0 || i === limite ? html`<span>${i}</span>` : ''}</span>`);
+  return html`<div class="nivel ${estado}" role="img" aria-label="${total} de ${limite} vagas do limite WIP ocupadas" style="--pos:${Math.min(1, total / limite)}">
+    <span class="nivel-tubo"><span class="nivel-bolha"></span></span>
+    <span class="nivel-regua" aria-hidden="true">${marcas}</span>
+  </div>`;
+};
+
 export const renderizarQuadro = (alvo, ctx) => {
   const { loja, filtro } = ctx;
   const quadro = loja.quadro;
@@ -40,7 +52,7 @@ export const renderizarQuadro = (alvo, ctx) => {
   const podeTarefas = pode(papel, 'tarefas');
   const podeColunas = pode(papel, 'colunas');
   const filtrando = filtroAtivo(filtro);
-  alvo.innerHTML = html`<div class="quadro" style="--cor-quadro:${quadro.cor}">
+  alvo.innerHTML = html`<div class="quadro" style="--cor-quadro:${corExibida(quadro.cor)}">
     ${quadro.colunas.map((col) => {
       const todos = cardsDaColuna(quadro, col.id);
       const visiveis = todos.filter((c) => atendeFiltro(quadro, c, filtro));
@@ -50,6 +62,7 @@ export const renderizarQuadro = (alvo, ctx) => {
           <h2 class="coluna-nome" title="${TIPOS[col.tipo]}">${col.nome}</h2>
           <span class="contador ${cheio ? 'contador-cheio' : ''}" title="${col.limiteWip ? 'Tarefas / limite WIP' : 'Tarefas'}">${filtrando ? `${visiveis.length} de ` : ''}${todos.length}${col.limiteWip ? `/${col.limiteWip}` : ''}</span>
           ${podeColunas ? html`<button class="botao-icone pequeno" data-menu-coluna="${col.id}" aria-label="Opções da coluna ${col.nome}">${icone('pontos')}</button>` : ''}
+          ${htmlNivel(todos.length, col.limiteWip)}
         </header>
         <div class="coluna-lista" data-lista="${col.id}">
           ${visiveis.map((c) => htmlCard(quadro, c, podeTarefas))}
