@@ -377,8 +377,6 @@ python docs/fonte/gerar_pdfs.py          # os dois; ou "manual" / "banco"
 
 Projeto desenvolvido em parceria com meu parceiro de projetos e de vida Erik Pimenta (@ravelroot).
 
-O repositório oficial fica em [Violet-pixel/Interactive-Kanban-Board](https://github.com/Violet-pixel/Interactive-Kanban-Board).
-
 ### Componentes de terceiros
 
 O Prumo inclui ou depende de componentes com licenças próprias, que continuam valendo para cada um deles:
