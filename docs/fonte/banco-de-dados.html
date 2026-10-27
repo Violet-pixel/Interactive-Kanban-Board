@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Prumo, banco de dados</title>
+<meta name="author" content="Clara Portes">
+<meta name="description" content="Arquitetura do banco de dados do Prumo">
+<meta name="dcterms.created" content="2026-10-26">
+<link rel="stylesheet" href="base.css">
+<style>
+  table.campos { font-size: 7.8pt; }
+  table.campos td { padding: 1.2mm 2mm; }
+  table.campos td:first-child { width: 24%; font-family: var(--mono); font-size: 7.4pt; color: var(--acao); }
+  table.campos td:nth-child(2) { width: 17%; font-family: var(--mono); font-size: 7.4pt; color: var(--ink-2); }
+  table.campos td:nth-child(3) { width: 22%; font-size: 7.6pt; }
+  .table-name { font-family: var(--mono); font-size: 11pt; font-weight: 600; color: var(--ink); margin: 6mm 0 1.5mm; break-after: avoid; }
+  .after-table { font-size: 8.2pt; color: var(--ink-2); margin-top: -3mm; margin-bottom: 4mm; }
+  .seq { display: flex; justify-content: space-between; margin: 2mm 0 1mm; break-inside: avoid; }
+  .seq-actor { width: 30%; text-align: center; font: 650 8.4pt var(--font); padding: 2mm; background: var(--folha); border: 0.6pt solid var(--line-strong); border-radius: 1.4mm; }
+  .seq-steps { list-style: none; padding: 0; margin: 0 0 2mm; break-inside: avoid; border-left: 0.6pt dashed var(--line-strong); border-right: 0.6pt dashed var(--line-strong); }
+  .seq-steps li { display: flex; align-items: center; gap: 2mm; font-size: 7.8pt; padding: 1.4mm 3mm; margin: 0; border-bottom: 0.4pt solid var(--line); }
+  .seq-steps li:last-child { border-bottom: 0; }
+  .seq-steps .who { flex: none; width: 34mm; font-weight: 650; color: var(--acao); }
+  .seq-steps .who.ok { color: var(--ok); }
+  .seq-steps .who.no { color: #B4382E; }
+  ol.steps { padding-left: 6mm; }
+  ol.steps li::marker { font-weight: 650; }
+  .legend { font-size: 7.8pt; color: var(--muted); }
+  #ch-postgres pre { margin: 1.5mm 0 3mm; font-size: 7.2pt; padding: 2.4mm 3.5mm; }
+  #ch-postgres h3 { margin-top: 5mm; }
+  #ch-postgres p { margin-bottom: 2mm; }
+  .legend b { color: var(--ink-2); }
+</style>
+</head>
+<body>
+<span class="doc-title">banco de dados</span><span class="doc-version">Versão 1.1.0, interface de outubro de 2026</span>
+
+<!-- ===================== CAPA ===================== -->
+<div class="cover">
+  <div class="mark"><svg viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#1C2126"/><path d="M50 10v30" stroke="#E7E9E3" stroke-width="4"/><rect x="38" y="38" width="24" height="8" rx="2" fill="#B07D24"/><path d="M34 48h32L50 90Z" fill="#B07D24"/><path d="M50 48v42" stroke="#1C2126" stroke-width="2" opacity=".35"/></svg></div>
+  <h1>Prumo</h1>
+  <div class="sub">Banco de dados</div>
+  <div class="desc">Arquitetura do banco de dados do Prumo: modelo de relacionamentos, tabelas, formato JSON do quadro, controle de revisões, consultas prontas e preparação do PostgreSQL 17 com Django 6.1.</div>
+  <div class="cols">
+    <div class="col"><b>Backlog</b><i style="--c:#2251A3"></i><i style="--c:#646C74"></i><i style="--c:#B07D24"></i></div>
+    <div class="col"><b>To Do</b><i style="--c:#B07D24"></i><i style="--c:#2251A3"></i></div>
+    <div class="col"><b>In Progress</b><i style="--c:#B4382E"></i><i style="--c:#2251A3"></i><i style="--c:#646C74"></i></div>
+    <div class="col"><b>Done</b><i style="--c:#3F7A3A"></i><i style="--c:#3F7A3A"></i></div>
+  </div>
+  <div class="foot">
+    <div><div class="author">Clara Portes</div>Copyright (©) 2026 Clara Portes. Licença MIT.</div>
+    <div class="right">Versão 1.1.0, interface de outubro de 2026<br>PostgreSQL 17 e Django 6.1</div>
+  </div>
+</div>
+
+<!-- ===================== SUMÁRIO ===================== -->
+<div class="toc-page">
+  <h2>Sumário</h2>
+  <nav class="toc"><ol>
+    <li class="ch"><a href="#ch-decisoes"><span class="n">1</span>Decisões de arquitetura</a></li>
+    <li class="sub"><a href="#s-onde">Onde cada dado fica</a></li>
+    <li class="sub"><a href="#s-navegador">O que fica só no navegador</a></li>
+    <li class="ch"><a href="#ch-diagrama"><span class="n">2</span>Diagrama de relacionamentos</a></li>
+    <li class="sub"><a href="#s-exclusao">Regras de exclusão</a></li>
+    <li class="ch"><a href="#ch-tabelas"><span class="n">3</span>Tabelas</a></li>
+    <li class="sub"><a href="#t-quadro">prumo_quadro</a></li>
+    <li class="sub"><a href="#t-membro">prumo_membro</a></li>
+    <li class="sub"><a href="#t-registro">prumo_registro</a></li>
+    <li class="sub"><a href="#t-anexo">prumo_anexo</a></li>
+    <li class="sub"><a href="#t-token">prumo_token</a></li>
+    <li class="ch"><a href="#ch-json"><span class="n">4</span>Formato JSON do quadro</a></li>
+    <li class="sub"><a href="#s-valores">Valores aceitos</a></li>
+    <li class="sub"><a href="#s-exportacao">Arquivo de exportação</a></li>
+    <li class="ch"><a href="#ch-revisoes"><span class="n">5</span>Controle de revisões</a></li>
+    <li class="ch"><a href="#ch-consultas"><span class="n">6</span>Consultas prontas</a></li>
+    <li class="sub"><a href="#q-atrasadas">Tarefas atrasadas de todos os quadros</a></li>
+    <li class="sub"><a href="#q-lead">Lead time médio por quadro</a></li>
+    <li class="sub"><a href="#q-moveu">Quem mais moveu tarefas</a></li>
+    <li class="sub"><a href="#q-papeis">Quadros e papéis de uma pessoa</a></li>
+    <li class="ch"><a href="#ch-postgres"><span class="n">7</span>Preparando o PostgreSQL</a></li>
+    <li class="sub"><a href="#p-gin">Índice extra para muitos quadros</a></li>
+    <li class="sub"><a href="#p-backup">Backup e restauração</a></li>
+    <li class="sub"><a href="#p-manutencao">Manutenção</a></li>
+  </ol></nav>
+  <p class="legend" style="margin-top:8mm">Este documento vale para a versão 1.1.0 com a interface de outubro de 2026. O esquema do banco e o formato JSON do quadro não mudaram em relação à 1.0.0.</p>
+</div>
+
+<!-- ===================== 1. DECISÕES ===================== -->
+<section class="chapter" id="ch-decisoes">
+  <div class="chapter-head"><div class="num">Capítulo 1</div><h2>Decisões de arquitetura</h2>
+    <p class="lede">O Prumo guarda dados de duas formas, e cada uma fica onde funciona melhor: o conteúdo do quadro num documento JSON e o que precisa de chave estrangeira em tabelas próprias.</p></div>
+
+  <h3 id="s-onde">Onde cada dado fica</h3>
+  <table>
+    <thead><tr><th>Dado</th><th>Onde fica</th><th>Por quê</th></tr></thead>
+    <tbody>
+      <tr><td>Conteúdo do quadro (colunas, tarefas, etiquetas, automações, histórico recente)</td><td>Uma coluna <code>jsonb</code> em <code>prumo_quadro.dados</code></td><td>A interface lê e salva o quadro inteiro e aplica as regras em JavaScript. Um documento por quadro deixa o salvamento atômico e o desfazer e refazer simples.</td></tr>
+      <tr><td>Quem pode acessar cada quadro</td><td><code>prumo_membro</code></td><td>Precisa de chave estrangeira, unicidade e consulta rápida por usuário.</td></tr>
+      <tr><td>Auditoria permanente</td><td><code>prumo_registro</code></td><td>O histórico dentro do JSON guarda só os últimos 500 itens. A tabela guarda tudo, com o usuário autenticado.</td></tr>
+      <tr><td>Arquivos</td><td><code>prumo_anexo</code> e disco</td><td>Binários não devem ir para o JSON nem para o banco.</td></tr>
+      <tr><td>Sessões da API</td><td><code>prumo_token</code></td><td>Só o hash SHA-256 do token é guardado.</td></tr>
+    </tbody>
+  </table>
+  <p>Para que ninguém sobrescreva o trabalho de outra pessoa, cada quadro tem uma revisão. Todo <code>PUT</code> informa a revisão que o navegador conhece; o servidor trava a linha, compara e só grava se as duas forem iguais. É um controle otimista de concorrência (capítulo 5).</p>
+
+  <h3 id="s-navegador">O que fica só no navegador</h3>
+  <p>As novidades da interface de outubro de 2026 não criam tabelas nem campos. Colunas recolhidas, filtros rápidos, buscas recentes, tema e densidade são preferências de cada navegador, guardadas no <code>localStorage</code> junto com o estado local. A adição rápida de tarefas, a vista em lista e a idade das tarefas na coluna trabalham sobre o mesmo JSON do quadro descrito no capítulo 4, usando campos que já existiam (como <code>movimentos</code> e <code>criadoEm</code>).</p>
+  <div class="note tip"><b class="t">Nada a migrar</b>Quem atualiza de uma versão anterior não precisa rodar nenhuma migração nova: o banco continua com a migração <code>0001_inicial</code>.</div>
+</section>
+
+<!-- ===================== 2. DIAGRAMA ===================== -->
+<section class="chapter" id="ch-diagrama">
+  <div class="chapter-head"><div class="num">Capítulo 2</div><h2>Diagrama de relacionamentos</h2>
+    <p class="lede">As cinco tabelas do Prumo e a tabela de usuários do Django, com tipos, chaves e as ligações entre elas. O diagrama completo está na página seguinte.</p></div>
+  <h3 id="s-exclusao">Regras de exclusão</h3>
+  <p>Excluir um quadro apaga em cascata seus membros, registros e anexos. Excluir um usuário apaga seus tokens e participações; nos quadros, registros e anexos, o autor vira NULL (<code>SET NULL</code>) e a auditoria é preservada.</p>
+  <table>
+    <thead><tr><th>Ao excluir</th><th>Tabela</th><th>Efeito</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="3">Um quadro</td><td><code>prumo_membro</code></td><td>Apagado (CASCADE)</td></tr>
+      <tr><td><code>prumo_registro</code></td><td>Apagado (CASCADE)</td></tr>
+      <tr><td><code>prumo_anexo</code></td><td>Apagado (CASCADE)</td></tr>
+      <tr><td rowspan="5">Um usuário</td><td><code>prumo_token</code></td><td>Apagado (CASCADE)</td></tr>
+      <tr><td><code>prumo_membro</code></td><td>Apagado (CASCADE)</td></tr>
+      <tr><td><code>prumo_quadro.criado_por_id</code></td><td>Vira NULL (SET NULL)</td></tr>
+      <tr><td><code>prumo_registro.usuario_id</code></td><td>Vira NULL (SET NULL)</td></tr>
+      <tr><td><code>prumo_anexo.enviado_por_id</code></td><td>Vira NULL (SET NULL)</td></tr>
+    </tbody>
+  </table>
+  <figure class="diagram page-break"><img src="diagrama-er.png"><figcaption><b>Figura 1</b> Tabelas do Prumo e <code>auth_user</code>, do Django. Cada linha é uma relação N:1: o traço duplo fica no lado 1 e o pé de galinha, no lado N; o círculo indica que o lado pode ficar vazio. <b>PK</b> chave primária, <b>FK</b> chave estrangeira, <b>UK</b> valor único. Na última coluna, o tamanho do texto ou NULL quando o campo aceita vazio.</figcaption></figure>
+  <p class="legend">Para gerar o diagrama de novo, rode <code>mmdc -i docs/fonte/diagrama-er.mmd -o docs/fonte/diagrama-er.png -c docs/fonte/diagrama-er.json -s 3 -b white</code> (Mermaid CLI).</p>
+
+</section>
+
+<!-- ===================== 3. TABELAS ===================== -->
+<section class="chapter" id="ch-tabelas">
+  <div class="chapter-head"><div class="num">Capítulo 3</div><h2>Tabelas</h2>
+    <p class="lede">Cada tabela do Prumo com os campos, o tipo no PostgreSQL, as restrições e para que serve.</p></div>
+
+  <div class="table-name" id="t-quadro">prumo_quadro</div>
+  <table class="campos">
+    <thead><tr><th>Campo</th><th>Tipo</th><th>Restrições</th><th>Descrição</th></tr></thead>
+    <tbody>
+      <tr><td>id</td><td>varchar(40)</td><td>PK</td><td>Id gerado no navegador (ex.: <code>qdr_3f9a1c2b7d4e</code>), o mesmo de <code>dados.id</code></td></tr>
+      <tr><td>nome</td><td>varchar(120)</td><td>NOT NULL</td><td>Cópia de <code>dados.nome</code>, para listar sem abrir o JSON</td></tr>
+      <tr><td>arquivado</td><td>boolean</td><td>NOT NULL, padrão false</td><td>Cópia de <code>dados.arquivado</code></td></tr>
+      <tr><td>revisao</td><td>integer</td><td>NOT NULL, CHECK ≥ 0, padrão 1</td><td>Soma 1 a cada salvamento aceito</td></tr>
+      <tr><td>dados</td><td>jsonb</td><td>NOT NULL</td><td>Documento completo do quadro (capítulo 4)</td></tr>
+      <tr><td>criado_por_id</td><td>integer</td><td>FK auth_user, NULL, SET NULL</td><td>Quem enviou o quadro</td></tr>
+      <tr><td>criado_em, atualizado_em</td><td>timestamptz</td><td>NOT NULL</td><td>Preenchidos automaticamente</td></tr>
+    </tbody>
+  </table>
+  <p class="after-table">Índice: <code>quadro_arquivado_nome_idx (arquivado, nome)</code>.</p>
+
+  <div class="table-name" id="t-membro">prumo_membro</div>
+  <table class="campos">
+    <thead><tr><th>Campo</th><th>Tipo</th><th>Restrições</th><th>Descrição</th></tr></thead>
+    <tbody>
+      <tr><td>id</td><td>bigint</td><td>PK identity</td><td></td></tr>
+      <tr><td>quadro_id</td><td>varchar(40)</td><td>FK prumo_quadro, CASCADE</td><td></td></tr>
+      <tr><td>usuario_id</td><td>integer</td><td>FK auth_user, CASCADE</td><td></td></tr>
+      <tr><td>papel</td><td>varchar(20)</td><td>CHECK em (admin, gerente, membro, visualizador)</td><td>Restrição <code>membro_papel_valido</code></td></tr>
+      <tr><td>adicionado_em</td><td>timestamptz</td><td>NOT NULL</td><td></td></tr>
+    </tbody>
+  </table>
+  <p class="after-table">Unicidade: <code>membro_unico_por_quadro (quadro_id, usuario_id)</code>. Superusuários veem todos os quadros como administradores, sem precisar de linha nesta tabela.</p>
+
+  <div class="table-name" id="t-registro">prumo_registro</div>
+  <table class="campos">
+    <thead><tr><th>Campo</th><th>Tipo</th><th>Restrições</th><th>Descrição</th></tr></thead>
+    <tbody>
+      <tr><td>id</td><td>bigint</td><td>PK identity</td><td></td></tr>
+      <tr><td>quadro_id</td><td>varchar(40)</td><td>FK, CASCADE</td><td></td></tr>
+      <tr><td>usuario_id</td><td>integer</td><td>FK, NULL, SET NULL</td><td>Usuário do token que salvou</td></tr>
+      <tr><td>cliente_id</td><td>varchar(40)</td><td></td><td>Id do registro gerado no navegador</td></tr>
+      <tr><td>autor</td><td>varchar(120)</td><td>NOT NULL</td><td>Nome do usuário autenticado, ou “Automação”</td></tr>
+      <tr><td>acao</td><td>varchar(60)</td><td>NOT NULL</td><td>criou, moveu, editou, comentou, anexou, aplicou regra…</td></tr>
+      <tr><td>detalhe</td><td>text</td><td></td><td>Ex.: “Corrigir travamento: To Do → In Progress”</td></tr>
+      <tr><td>card_id</td><td>varchar(40)</td><td></td><td>Tarefa afetada, quando houver</td></tr>
+      <tr><td>em</td><td>timestamptz</td><td>NOT NULL</td><td>Momento da ação no navegador</td></tr>
+    </tbody>
+  </table>
+  <p class="after-table">Índices: <code>registro_quadro_em_idx (quadro_id, em DESC)</code> e <code>registro_quadro_card_idx (quadro_id, card_id)</code>. Unicidade parcial <code>registro_cliente_unico (quadro_id, cliente_id) WHERE cliente_id &lt;&gt; ''</code>: se o navegador reenviar o mesmo registro depois de uma falha de rede, ele não é duplicado.</p>
+
+  <div class="table-name" id="t-anexo">prumo_anexo</div>
+  <table class="campos">
+    <thead><tr><th>Campo</th><th>Tipo</th><th>Restrições</th><th>Descrição</th></tr></thead>
+    <tbody>
+      <tr><td>id</td><td>uuid</td><td>PK</td><td>Também compõe a URL de download</td></tr>
+      <tr><td>quadro_id</td><td>varchar(40)</td><td>FK, CASCADE</td><td></td></tr>
+      <tr><td>card_id</td><td>varchar(40)</td><td>NOT NULL</td><td>Tarefa dona do anexo</td></tr>
+      <tr><td>nome, tipo</td><td>varchar(255), varchar(120)</td><td></td><td>Nome original e tipo MIME</td></tr>
+      <tr><td>tamanho</td><td>bigint</td><td>CHECK ≥ 0</td><td>Bytes</td></tr>
+      <tr><td>arquivo</td><td>varchar(100)</td><td>NOT NULL</td><td>Caminho relativo a <code>PRUMO_MEDIA_ROOT</code>: <code>{quadro}/{uuid}-{nome}</code></td></tr>
+      <tr><td>enviado_por_id</td><td>integer</td><td>FK, NULL, SET NULL</td><td></td></tr>
+      <tr><td>enviado_em</td><td>timestamptz</td><td>NOT NULL</td><td></td></tr>
+    </tbody>
+  </table>
+  <p class="after-table">Índice: <code>anexo_quadro_card_idx (quadro_id, card_id)</code>.</p>
+
+  <div class="table-name" id="t-token">prumo_token</div>
+  <table class="campos">
+    <thead><tr><th>Campo</th><th>Tipo</th><th>Restrições</th><th>Descrição</th></tr></thead>
+    <tbody>
+      <tr><td>id</td><td>bigint</td><td>PK identity</td><td></td></tr>
+      <tr><td>usuario_id</td><td>integer</td><td>FK auth_user, CASCADE</td><td></td></tr>
+      <tr><td>chave_hash</td><td>varchar(64)</td><td>UNIQUE</td><td>SHA-256 do token; o token em si nunca é gravado</td></tr>
+      <tr><td>criado_em, expira_em</td><td>timestamptz</td><td>NOT NULL</td><td>Validade definida por <code>PRUMO_TOKEN_HORAS</code></td></tr>
+    </tbody>
+  </table>
+  <p class="after-table">As tabelas <code>auth_user</code>, <code>auth_group</code>, <code>auth_permission</code>, <code>django_content_type</code> e <code>django_migrations</code> são criadas pelo próprio Django.</p>
+</section>
+
+<!-- ===================== 4. JSON ===================== -->
+<section class="chapter" id="ch-json">
+  <div class="chapter-head"><div class="num">Capítulo 4</div><h2>Formato JSON do quadro</h2>
+    <p class="lede">O mesmo formato é usado no <code>localStorage</code>, na coluna <code>dados</code>, na exportação JSON e no arquivo <code>exemplos/lancamento.json</code>.</p></div>
+  <pre>{
+  "id": "qdr_3f9a1c2b7d4e", "nome": "Sprint 14", "descricao": "", "cor": "#707645",
+  "modelo": "scrum", "arquivado": false, "bloquearDependencias": true,
+  "criadoEm": "2026-10-01T13:00:00.000Z", "atualizadoEm": "2026-10-21T19:40:12.000Z",
+  "colunas": [
+    { "id": "col_a1", "nome": "Sprint Backlog", "tipo": "espera",    "limiteWip": 0 },
+    { "id": "col_a2", "nome": "Em andamento",   "tipo": "andamento", "limiteWip": 4 },
+    { "id": "col_a3", "nome": "Pronto",         "tipo": "concluido", "limiteWip": 0 }
+  ],
+  "etiquetas": [ { "id": "etq_b1", "nome": "Bug", "cor": "#6B1F33" } ],
+  "cards": [ {
+    "id": "crd_c1", "colunaId": "col_a2", "ordem": 0,
+    "titulo": "Corrigir login", "descricao": "...", "responsavel": "Carla Dias",
+    "prioridade": "alta", "etiquetas": ["etq_b1"], "inicio": "", "prazo": "2026-10-24",
+    "subtarefas":  [ { "id": "sub_1", "texto": "Reproduzir", "feito": true } ],
+    "comentarios": [ { "id": "cmt_1", "autor": "Bruno Lima", "texto": "@Carla veja",
+                       "em": "..." } ],
+    "anexos":      [ { "id": "...", "nome": "erro.png", "tipo": "image/png",
+                       "tamanho": 48213, "url": "/api/v1/anexos/..." } ],
+    "dependencias": ["crd_c0"],
+    "criadoEm": "...", "iniciadoEm": "...", "concluidoEm": null,
+    "movimentos": [ { "de": "col_a1", "para": "col_a2", "em": "..." } ]
+  } ],
+  "automacoes": [ { "id": "aut_1", "nome": "Review para o Bruno", "ativa": true,
+                    "gatilho": { "tipo": "entrar", "colunaId": "col_a2" },
+                    "acao":    { "tipo": "atribuir", "valor": "Bruno Lima" } } ],
+  "historico": [ { "id": "reg_1", "em": "...", "autor": "Ana Souza", "acao": "moveu",
+                   "detalhe": "Corrigir login: Sprint Backlog → Em andamento",
+                   "cardId": "crd_c1" } ],
+  "membros": [ { "nome": "Ana Souza", "email": "admin@prumo.dev", "papel": "admin" } ]
+}</pre>
+
+  <h3 id="s-valores">Valores aceitos</h3>
+  <table>
+    <thead><tr><th>Campo</th><th>Valores aceitos</th></tr></thead>
+    <tbody>
+      <tr><td><code>colunas[].tipo</code></td><td><code>espera</code>, <code>andamento</code>, <code>concluido</code></td></tr>
+      <tr><td><code>cards[].prioridade</code></td><td><code>urgente</code>, <code>alta</code>, <code>media</code>, <code>baixa</code></td></tr>
+      <tr><td><code>cards[].prazo</code>, <code>inicio</code></td><td><code>AAAA-MM-DD</code> ou vazio</td></tr>
+      <tr><td><code>automacoes[].gatilho.tipo</code></td><td><code>entrar</code>, <code>criar</code></td></tr>
+      <tr><td><code>automacoes[].acao.tipo</code></td><td><code>atribuir</code>, <code>prioridade</code>, <code>etiqueta</code>, <code>mover</code>, <code>concluir_subtarefas</code>, <code>prazo_dias</code></td></tr>
+      <tr><td>Datas com hora</td><td>ISO 8601 em UTC</td></tr>
+    </tbody>
+  </table>
+  <p>O servidor valida que <code>id</code> é texto de até 40 caracteres e que <code>colunas</code> e <code>cards</code> são listas. O limite do corpo da requisição é 5 MB. Quando quem salva tem o papel membro, o servidor compara <code>colunas</code>, <code>etiquetas</code>, <code>automacoes</code> e <code>bloquearDependencias</code> com a versão gravada e recusa (403) qualquer diferença.</p>
+  <p>A idade de uma tarefa na coluna, mostrada nos cards e na vista em lista, sai do último item de <code>movimentos</code> (ou de <code>criadoEm</code>, se ela nunca mudou de coluna). Nenhum campo novo foi criado para isso.</p>
+
+  <h3 id="s-exportacao">Arquivo de exportação</h3>
+  <p>Na exportação, o arquivo envolve os quadros em <code>{"formato": "prumo", "versao": 1, "referencia": "...", "quadros": [...]}</code>, como em <code>exemplos/lancamento.json</code>.</p>
+</section>
+
+<!-- ===================== 5. REVISÕES ===================== -->
+<section class="chapter" id="ch-revisoes">
+  <div class="chapter-head"><div class="num">Capítulo 5</div><h2>Controle de revisões</h2>
+    <p class="lede">Dois navegadores salvando o mesmo quadro na revisão 7. O primeiro PUT vence; o segundo recebe 409 e a versão atual.</p></div>
+  <div class="seq"><div class="seq-actor">Navegador A</div><div class="seq-actor">Servidor</div><div class="seq-actor">Navegador B</div></div>
+  <ol class="seq-steps">
+    <li><span class="who">A e B</span>PUT com revisao=7, quase ao mesmo tempo</li>
+    <li><span class="who">Servidor</span>A chega primeiro: FOR UPDATE trava a linha</li>
+    <li><span class="who ok">Servidor para A</span>7 = 7: grava, a revisão passa a 8, COMMIT e responde 200 {revisao: 8}</li>
+    <li><span class="who">Servidor</span>B espera a trava; depois compara 7 ≠ 8</li>
+    <li><span class="who no">Servidor para B</span>Responde 409 {revisao: 8, dados}</li>
+    <li><span class="who">Servidor para todos</span>WebSocket: evento quadro, revisão 8, autor A</li>
+    <li><span class="who">Navegador B</span>Carrega a versão 8 e avisa a pessoa</li>
+  </ol>
+  <pre>BEGIN;
+SELECT revisao FROM prumo_quadro WHERE id = 'qdr_demonstracao' FOR UPDATE;
+UPDATE prumo_quadro SET dados = $1, nome = $2, arquivado = $3,
+       revisao = revisao + 1, atualizado_em = now()
+ WHERE id = 'qdr_demonstracao';
+INSERT INTO prumo_registro (...) VALUES (...) ON CONFLICT DO NOTHING;
+COMMIT;</pre>
+  <ol class="steps">
+    <li>O navegador guarda a revisão que recebeu no <code>GET</code> ou no último <code>PUT</code>.</li>
+    <li>No <code>PUT</code>, o servidor abre uma transação e executa <code>SELECT ... FOR UPDATE</code> na linha do quadro.</li>
+    <li>Se a revisão enviada for diferente da gravada, responde 409 com <code>{revisao, dados}</code> atuais e não grava nada.</li>
+    <li>Se for igual, grava <code>dados</code>, faz <code>revisao = revisao + 1</code>, insere os registros novos com <code>ON CONFLICT DO NOTHING</code> e confirma.</li>
+    <li>Depois do commit, envia o evento <code>quadro</code> pelo channel layer para o grupo <code>quadro_{id}</code>.</li>
+  </ol>
+</section>
+
+<!-- ===================== 6. CONSULTAS ===================== -->
+<section class="chapter" id="ch-consultas">
+  <div class="chapter-head"><div class="num">Capítulo 6</div><h2>Consultas prontas</h2>
+    <p class="lede">Consultas em SQL para o PostgreSQL, lendo o JSON do quadro e as tabelas de auditoria e de membros.</p></div>
+  <h3 id="q-atrasadas">Tarefas atrasadas de todos os quadros, direto do JSON</h3>
+  <pre>SELECT q.nome AS quadro, c->>'titulo' AS tarefa, c->>'responsavel' AS responsavel,
+       (c->>'prazo')::date AS prazo
+  FROM prumo_quadro q
+ CROSS JOIN LATERAL jsonb_array_elements(q.dados->'cards') c
+  JOIN LATERAL jsonb_array_elements(q.dados->'colunas') col
+       ON col->>'id' = c->>'colunaId'
+ WHERE c->>'prazo' &lt;&gt; '' AND (c->>'prazo')::date &lt; current_date
+   AND col->>'tipo' &lt;&gt; 'concluido' AND NOT q.arquivado
+ ORDER BY prazo;</pre>
+  <h3 id="q-lead">Lead time médio por quadro, em dias</h3>
+  <pre>SELECT q.nome,
+       round(avg(extract(epoch FROM ((c->>'concluidoEm')::timestamptz
+             - (c->>'criadoEm')::timestamptz)) / 86400)::numeric, 1) AS lead_time_dias
+  FROM prumo_quadro q
+ CROSS JOIN LATERAL jsonb_array_elements(q.dados->'cards') c
+ WHERE c->>'concluidoEm' IS NOT NULL
+ GROUP BY q.nome;</pre>
+  <h3 id="q-moveu">Quem mais moveu tarefas nos últimos 30 dias</h3>
+  <pre>SELECT autor, count(*) AS movimentos
+  FROM prumo_registro
+ WHERE acao = 'moveu' AND em &gt; now() - interval '30 days'
+ GROUP BY autor ORDER BY movimentos DESC;</pre>
+  <h3 id="q-papeis">Quadros e papéis de uma pessoa</h3>
+  <pre>SELECT q.nome, m.papel
+  FROM prumo_membro m JOIN prumo_quadro q ON q.id = m.quadro_id
+  JOIN auth_user u ON u.id = m.usuario_id
+ WHERE lower(u.email) = 'gerente@prumo.dev';</pre>
+</section>
+
+<!-- ===================== 7. POSTGRES ===================== -->
+<section class="chapter" id="ch-postgres">
+  <div class="chapter-head"><div class="num">Capítulo 7</div><h2>Preparando o PostgreSQL</h2>
+    <p class="lede">Com Docker não há nada a fazer: o serviço <code>postgres</code> do <code>docker-compose.yml</code> cria o banco e o usuário a partir do <code>.env</code>. Para um servidor próprio:</p></div>
+  <pre>CREATE ROLE prumo LOGIN PASSWORD 'troque-esta-senha';
+CREATE DATABASE prumo OWNER prumo ENCODING 'UTF8' TEMPLATE template0;
+\c prumo
+ALTER SCHEMA public OWNER TO prumo;</pre>
+  <p>Depois, no <code>.env</code> ou no ambiente do servidor:</p>
+  <pre>PRUMO_DB_ENGINE=postgresql
+PRUMO_DB_HOST=localhost
+PRUMO_DB_PORT=5432
+PRUMO_DB_NAME=prumo
+PRUMO_DB_USER=prumo
+PRUMO_DB_PASSWORD=troque-esta-senha
+
+python manage.py migrate
+python manage.py criarusuario --email voce@empresa.com --nome "Seu Nome" --admin</pre>
+  <p>Com SQLite (desenvolvimento), as mesmas tabelas existem; <code>jsonb</code> vira <code>text</code>, consultado com as funções JSON do SQLite.</p>
+  <h3 id="p-gin">Índice extra para muitos quadros</h3>
+  <p>Se você vai consultar o JSON com frequência (capítulo 6), crie um índice GIN:</p>
+  <pre>CREATE INDEX quadro_dados_gin ON prumo_quadro USING gin (dados jsonb_path_ops);</pre>
+  <h3 id="p-backup">Backup e restauração</h3>
+  <pre>docker compose exec postgres pg_dump -U prumo -Fc prumo &gt; prumo.dump
+docker compose exec -T postgres pg_restore -U prumo -d prumo --clean &lt; prumo.dump</pre>
+  <p>Os anexos ficam no volume <code>anexos</code> (<code>/dados/anexos</code> no contêiner) e precisam entrar no backup junto com o banco.</p>
+  <h3 id="p-manutencao">Manutenção</h3>
+  <p>Tokens vencidos são apagados a cada login do mesmo usuário. O histórico permanente cresce com o uso. Para limpar todos os tokens vencidos e manter só o último ano de histórico:</p>
+  <pre>DELETE FROM prumo_token WHERE expira_em &lt; now();
+DELETE FROM prumo_registro WHERE em &lt; now() - interval '1 year';</pre>
+</section>
+</body>
+</html>

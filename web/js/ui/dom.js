@@ -31,7 +31,7 @@ export const corExibida = (cor) => CORES_1_1[String(cor ?? '').toUpperCase()]?.[
 
 export const nomeCor = (cor) => CORES_1_1[String(cor ?? '').toUpperCase()]?.[1] ?? cor;
 
-export const LOGO = '<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="13" y="13" width="74" height="74" fill="none" stroke="currentColor" stroke-width="6"/><rect x="47" y="13" width="6" height="74" fill="currentColor"/><rect x="22" y="26" width="18" height="8" fill="currentColor"/><rect x="22" y="42" width="18" height="8" fill="currentColor"/><rect x="22" y="58" width="12" height="8" fill="currentColor"/><path d="M60 52l8 9 13-20" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="square"/></svg>';
+export const LOGO = '<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6v32" stroke="currentColor" stroke-width="4"/><rect x="37" y="36" width="26" height="9" rx="2" fill="currentColor"/><path d="M33 48h34L50 94Z" fill="var(--latao, #B07D24)"/><path d="M50 48v46" stroke="currentColor" stroke-width="2" opacity=".3"/></svg>';
 
 export const ICONES = {
   desfazer: '<svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>',
@@ -48,6 +48,11 @@ export const ICONES = {
   elo: '<svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-1 1"/><path d="M14 10a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l1-1"/></svg>',
   fechar: '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   usuario: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+  seta: '<svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>',
+  mao: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+  recolher: '<svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg>',
+  expandir: '<svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>',
+  ampulheta: '<svg viewBox="0 0 24 24"><path d="M6 3h12M6 21h12M7 3c0 6 10 6 10 9s-10 3-10 9M17 3c0 6-10 6-10 9"/></svg>',
   raio: '<svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>'
 };
 

@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Prumo, manual de uso e instalação</title>
+<meta name="author" content="Clara Portes">
+<meta name="description" content="Manual de uso e instalação do Prumo, quadro Kanban interativo">
+<link rel="stylesheet" href="base.css">
+<style>
+  .feature-list .item { padding: 1.8mm 0; border-bottom: 0.5pt solid var(--line); break-inside: avoid; }
+  .feature-list .item b { display: block; font-family: var(--serif); font-weight: 600; font-size: 10pt; }
+  .swatches { display: flex; gap: 2mm; margin: 2mm 0 4mm; }
+  .sw { flex: 1; font-size: 7.6pt; line-height: 1.35; }
+  .sw .chip { height: 13mm; border-radius: 1.4mm; border: 0.5pt solid rgba(0,0,0,.08); margin-bottom: 1.6mm; }
+  .sw b { display: block; font-size: 8.2pt; }
+  .sw .hex { font-family: var(--mono); font-size: 7pt; color: var(--muted); display: block; margin-bottom: 0.6mm; }
+  .voices { display: flex; gap: 4mm; margin: 2mm 0 4mm; }
+  .voice { flex: 1; border-top: 0.8pt solid var(--ink); padding-top: 2mm; }
+  .voice .sample { font-size: 19pt; line-height: 1.1; margin: 1mm 0 1.6mm; }
+  .voice.serif .sample { font-family: var(--serif); font-weight: 600; }
+  .voice.sans .sample { font-family: var(--font); font-weight: 600; }
+  .voice.mono .sample { font-family: var(--mono); font-size: 13pt; padding-top: 2.4mm; }
+  .voice p { font-size: 7.8pt; color: var(--ink-2); }
+  .flow { display: flex; gap: 1.6mm; margin: 2mm 0 4mm; }
+  .flow div { flex: 1; background: var(--papel); padding: 2mm 2.4mm; font-size: 7.6pt; line-height: 1.35; border-top: 1.6pt solid var(--acao); border-radius: 0 0 1.2mm 1.2mm; }
+  .flow div b { display: block; font-size: 8pt; color: var(--acao); margin-bottom: 0.8mm; }
+  .flow div.dados { border-top-color: var(--latao); }
+  .flow div.dados b { color: var(--latao-ink); }
+  .nivel-demo { display: flex; gap: 4mm; margin: 3mm 0 4mm; }
+  .nivel-demo .n { flex: 1; font-size: 7.6pt; color: var(--ink-2); }
+  .nivel-demo .tubo { position: relative; height: 4mm; border-radius: 2mm; background: #EBDDBC; border: 0.6pt solid #8E6A26; margin-bottom: 1.5mm; }
+  .nivel-demo .tubo i { position: absolute; top: 0.8mm; width: 7mm; height: 2.2mm; border-radius: 1.2mm; background: #fff; border: 0.5pt solid #555; }
+  .nivel-demo .cheio .tubo { background: #F1D2CE; border-color: #B4382E; }
+  .nivel-demo b { display: block; color: var(--ink); font-size: 8pt; }
+  ol.steps { padding-left: 6mm; }
+  ol.steps li::marker { font-weight: 650; }
+</style>
+</head>
+<body>
+<span class="doc-title">manual de uso e instalação</span><span class="doc-version">Versão 1.1.0, interface de outubro de 2026</span>
+
+<div class="cover">
+  <svg class="plumb" viewBox="0 0 26 150"><path d="M13 0v104" stroke="#1C2126" stroke-width="0.8"/><rect x="7.5" y="102" width="11" height="4" rx="1" fill="#1C2126"/><path d="M5.5 107h15L13 140Z" fill="#B07D24"/></svg>
+  <div class="mark"><svg viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#1C2126"/><path d="M50 10v30" stroke="#E7E9E3" stroke-width="4"/><rect x="38" y="38" width="24" height="8" rx="2" fill="#E7E9E3"/><path d="M34 48h32L50 90Z" fill="#C99536"/></svg></div>
+  <h1>Prumo</h1>
+  <div class="sub">Manual de uso e instalação</div>
+  <div class="desc">Quadro Kanban interativo em JavaScript, com API REST em Django, colaboração em tempo real, automações, limites WIP e métricas de fluxo.</div>
+  <div class="cols">
+    <div class="col"><b>Backlog</b><i style="--c:#58616A"></i><i style="--c:#B07D24"></i><i style="--c:#58616A"></i></div>
+    <div class="col"><b>Em andamento</b><i style="--c:#B4382E"></i><i style="--c:#2251A3"></i></div>
+    <div class="col"><b>Revisão</b><i style="--c:#2251A3"></i></div>
+    <div class="col"><b>Feito</b><i style="--c:#3F7A3A"></i><i style="--c:#3F7A3A"></i><i style="--c:#3F7A3A"></i><i style="--c:#3F7A3A"></i></div>
+  </div>
+  <div class="foot">
+    <div><div class="author">Clara Portes</div>Copyright (©) 2026 Clara Portes. Licença MIT.</div>
+    <div class="right">Versão 1.1.0, interface de outubro de 2026<br>Rio de Janeiro, pt-BR</div>
+  </div>
+</div>
+
+<div class="toc-page">
+  <h2>Sumário</h2>
+  <nav class="toc"><ol>
+    <li class="ch"><a href="#c-novidades"><span class="n">1</span>Novidades da interface</a></li>
+    <li class="ch"><a href="#c-geral"><span class="n">2</span>Visão geral</a></li>
+    <li class="sub"><a href="#s-identidade">Identidade visual</a></li>
+    <li class="sub"><a href="#s-req">Requisitos</a></li>
+    <li class="ch"><a href="#c-instalar"><span class="n">3</span>Instalar e rodar</a></li>
+    <li class="sub"><a href="#s-docker">Com Docker</a></li>
+    <li class="sub"><a href="#s-local">Modo local sem servidor</a></li>
+    <li class="sub"><a href="#s-semdocker">Servidor sem Docker</a></li>
+    <li class="ch"><a href="#c-uso"><span class="n">4</span>Usar o quadro</a></li>
+    <li class="sub"><a href="#u-tela">A tela principal</a></li>
+    <li class="sub"><a href="#u-quadros">Quadros e modelos</a></li>
+    <li class="sub"><a href="#u-colunas">Colunas, limites WIP e colunas recolhidas</a></li>
+    <li class="sub"><a href="#u-tarefas">Tarefas e adição rápida</a></li>
+    <li class="sub"><a href="#u-arrastar">Arrastar, soltar e ações rápidas</a></li>
+    <li class="sub"><a href="#u-detalhes">Subtarefas, anexos e comentários</a></li>
+    <li class="sub"><a href="#u-dep">Dependências</a></li>
+    <li class="sub"><a href="#u-filtros">Busca e filtros rápidos</a></li>
+    <li class="sub"><a href="#u-comandos">Ir para (Ctrl+K) e atalhos</a></li>
+    <li class="ch"><a href="#c-vistas"><span class="n">5</span>Vistas</a></li>
+    <li class="sub"><a href="#v-lista">Lista</a></li>
+    <li class="sub"><a href="#v-calendario">Calendário</a></li>
+    <li class="sub"><a href="#v-painel">Painel e métricas</a></li>
+    <li class="sub"><a href="#v-historico">Histórico, desfazer e refazer</a></li>
+    <li class="ch"><a href="#c-equipe"><span class="n">6</span>Equipe e automação</a></li>
+    <li class="sub"><a href="#e-auto">Automações</a></li>
+    <li class="sub"><a href="#e-notif">Notificações</a></li>
+    <li class="sub"><a href="#e-papeis">Contas, papéis e tempo real</a></li>
+    <li class="sub"><a href="#e-dados">Exportar e importar</a></li>
+    <li class="ch"><a href="#c-ref"><span class="n">7</span>Referência</a></li>
+    <li class="sub"><a href="#r-api">API REST e WebSocket</a></li>
+    <li class="sub"><a href="#r-rel">Relatórios em Node e Java</a></li>
+    <li class="sub"><a href="#r-cfg">Configuração</a></li>
+    <li class="sub"><a href="#r-pers">Personalização</a></li>
+    <li class="sub"><a href="#r-testes">Testes e manuais</a></li>
+    <li class="ch"><a href="#c-prob"><span class="n">8</span>Solução de problemas</a></li>
+  </ol></nav>
+</div>
+
+<section class="chapter" id="c-novidades">
+  <div class="chapter-head"><div class="num">Capítulo 1</div><h2>Novidades da interface</h2>
+    <p class="lede">Esta rodada mexe só na interface. A API, o formato JSON e o banco são os mesmos da 1.1.0, então quadros exportados antes abrem sem conversão.</p></div>
+  <ul>
+    <li><b>Mesa de obra.</b> O quadro fica sobre papel milimetrado; cada coluna é uma raia com cantos arredondados e as tarefas são fichas brancas com o título em Literata. O logo virou um prumo de pedreiro, com o peso em latão.</li>
+    <li><b>Tipografia do Lume.</b> Literata nos títulos e nas tarefas, Public Sans na interface e IBM Plex Mono nos números (contagens, limite WIP, dias na coluna), no lugar da Schibsted Grotesk e da Source Serif 4.</li>
+    <li><b>Adição rápida.</b> Ao criar uma tarefa, <code>@ana #bug !alta &gt;sexta</code> já preenche responsável, etiqueta, prioridade e prazo, com uma prévia antes de salvar (seção 4.4).</li>
+    <li><b>Filtros rápidos.</b> Os cinco seletores viraram botões de um clique, cada um com a contagem: Minhas tarefas, Atrasadas, Bloqueadas e Paradas há 5 dias. Os filtros completos ficam em Mais filtros (seção 4.8).</li>
+    <li><b>Tarefas paradas.</b> O card mostra há quantos dias está na mesma coluna quando passa de 5; acima de 10 o selo fica vermelho.</li>
+    <li><b>Ações rápidas no card.</b> Passe o mouse para Assumir a tarefa ou movê-la para a próxima coluna sem abrir a janela.</li>
+    <li><b>Colunas recolhidas.</b> A seta no topo encolhe a coluna numa faixa vertical; ela continua recebendo tarefas arrastadas.</li>
+    <li><b>Vista Lista.</b> Todas as tarefas numa tabela que ordena por título, status, responsável, prioridade, prazo ou dias na coluna (seção 5.1).</li>
+    <li><b>Ir para (Ctrl+K).</b> Uma caixa que encontra qualquer tarefa, quadro, vista ou ação pelo nome (seção 4.9).</li>
+    <li><b>Atalhos novos.</b> <kbd>M</kbd> mostra só as suas tarefas, <kbd>1</kbd> a <kbd>5</kbd> trocam de vista e o rodapé tem o link Atalhos.</li>
+    <li>Capturas de tela e os dois manuais refeitos. O HTML dos PDFs agora fica no repositório, em <code>docs/fonte/</code>.</li>
+  </ul>
+  <figure><img src="../images/tela-quadro.png"><figcaption><b>Figura 1</b> Quadro de exemplo com a identidade nova: papel milimetrado, raias, fichas, nível de bolha e filtros rápidos.</figcaption></figure>
+</section>
+
+<section class="chapter" id="c-geral">
+  <div class="chapter-head"><div class="num">Capítulo 2</div><h2>Visão geral</h2>
+    <p class="lede">O Prumo é um gerenciador de tarefas no estilo Kanban. Toda a lógica do quadro fica em módulos JavaScript na pasta <code>web/js</code> e roda direto no navegador, sem etapa de build.</p></div>
+  <p>Mover tarefas, limites WIP, dependências, automações, desfazer e refazer, métricas, filtros, adição rápida, importação e exportação são funções puras testadas no Node. O servidor em Django é opcional. Sem ele, o Prumo guarda tudo no <code>localStorage</code> do navegador. Com ele, os quadros vão para o PostgreSQL, cada pessoa entra com a própria conta, os papéis passam a valer e as alterações chegam por WebSocket a quem estiver com o mesmo quadro aberto.</p>
+  <table>
+    <thead><tr><th>Parte</th><th>Tecnologia</th><th>Pasta</th></tr></thead>
+    <tbody>
+      <tr><td>Interface e núcleo</td><td>JavaScript (ES2022), HTML5, CSS3, API de Drag and Drop nativa</td><td><code>web/</code></td></tr>
+      <tr><td>API REST e tempo real</td><td>Python 3.13, Django 6.1, Channels 4, Daphne</td><td><code>prumo/</code></td></tr>
+      <tr><td>Banco de dados</td><td>PostgreSQL 17 (SQLite para desenvolvimento)</td><td><code>prumo/models.py</code></td></tr>
+      <tr><td>Relatórios</td><td>Node.js 20+ e Java 21</td><td><code>scripts/</code>, <code>ferramentas/java/</code></td></tr>
+      <tr><td>Manuais</td><td>HTML, CSS e WeasyPrint</td><td><code>docs/fonte/</code></td></tr>
+    </tbody>
+  </table>
+  <div class="flow">
+    <div><b>Navegador</b>web/: HTML, CSS e JavaScript</div>
+    <div class="dados"><b>localStorage</b>uma cópia por navegador</div>
+    <div><b>Django</b>REST /api/v1 com token</div>
+    <div><b>Channels</b>WebSocket /ws/quadros/{id}</div>
+    <div class="dados"><b>PostgreSQL 17</b>quadros, membros, histórico, anexos</div>
+  </div>
+
+  <h3 id="s-identidade">Identidade visual</h3>
+  <p>O nome vem do prumo de pedreiro, o peso na ponta de um fio que mostra o que está alinhado. A interface é uma mesa de obra: papel milimetrado sob o quadro, tinta grafite, o azul da linha de giz para ações e foco e o latão do prumo para destaques. O limite WIP de cada coluna é um nível de bolha.</p>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#F2F3EF"></div><b>Papel</b><span class="hex">#F2F3EF</span>Fundo e grade</div>
+    <div class="sw"><div class="chip" style="background:#1C2126"></div><b>Grafite</b><span class="hex">#1C2126</span>Texto e logo</div>
+    <div class="sw"><div class="chip" style="background:#2251A3"></div><b>Linha de giz</b><span class="hex">#2251A3</span>Ações, foco, aba ativa</div>
+    <div class="sw"><div class="chip" style="background:#B07D24"></div><b>Latão</b><span class="hex">#B07D24</span>Nível WIP, prioridade alta</div>
+    <div class="sw"><div class="chip" style="background:#B4382E"></div><b>Marcação</b><span class="hex">#B4382E</span>Atraso e limite estourado</div>
+    <div class="sw"><div class="chip" style="background:#3F7A3A"></div><b>Verde</b><span class="hex">#3F7A3A</span>Concluído</div>
+  </div>
+  <div class="voices">
+    <div class="voice serif"><div class="sample">Literata</div><p>Nome do quadro, colunas, títulos das tarefas e das janelas. As tarefas parecem fichas escritas.</p></div>
+    <div class="voice sans"><div class="sample">Public Sans</div><p>Botões, filtros, campos, selos e textos de apoio.</p></div>
+    <div class="voice mono"><div class="sample">IBM Plex Mono</div><p>Números que se comparam: contagens das colunas, limite WIP, dias na coluna, atalhos.</p></div>
+  </div>
+
+  <h3 id="s-req">Requisitos</h3>
+  <table>
+    <thead><tr><th>Para</th><th>Você precisa de</th></tr></thead>
+    <tbody>
+      <tr><td>Rodar tudo (recomendado)</td><td>Docker Desktop (Windows ou macOS) ou Docker Engine com Compose (Linux)</td></tr>
+      <tr><td>Só a interface</td><td>Node.js 20 ou mais novo, ou qualquer servidor de arquivos estáticos</td></tr>
+      <tr><td>Servidor sem Docker</td><td>Python 3.13 e, se quiser, PostgreSQL 17</td></tr>
+      <tr><td>Ferramenta em Java</td><td>JDK 21</td></tr>
+      <tr><td>Navegador</td><td>Chrome, Edge, Firefox ou Safari atualizados</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="chapter" id="c-instalar">
+  <div class="chapter-head"><div class="num">Capítulo 3</div><h2>Instalar e rodar</h2>
+    <p class="lede">Com Docker, um script sobe o banco e o servidor e abre o navegador. Sem Docker, dá para usar só a interface ou o Django direto.</p></div>
+  <h3 id="s-docker">Com Docker</h3>
+  <ol class="steps">
+    <li>Baixe o projeto com <code>git clone https://github.com/Violet-pixel/Interactive-Kanban-Board.git</code> ou pelo ZIP do botão Code no GitHub.</li>
+    <li>No Windows, dê dois cliques em <code>iniciar.cmd</code>. No Linux ou no macOS, rode <code>./iniciar.sh</code>.</li>
+    <li>Na primeira vez, o script copia <code>.env.example</code> para <code>.env</code> e sorteia a senha do banco e a chave do Django.</li>
+    <li>O Docker sobe dois contêineres: <code>postgres</code> (banco) e <code>web</code> (Django e Daphne). O <code>web</code> aplica as migrações e cria a demonstração se o banco estiver vazio.</li>
+    <li>Quando <code>/api/v1/saude</code> responder, o navegador abre em <code>http://localhost:8080</code>.</li>
+  </ol>
+  <pre>docker compose ps                # estado dos contêineres
+docker compose logs -f web       # acompanhar o servidor
+docker compose down              # parar (os dados ficam no volume)
+docker compose down -v           # parar e apagar banco e anexos</pre>
+  <h4>Contas de demonstração</h4>
+  <table>
+    <thead><tr><th>Papel</th><th>E-mail</th><th>O que pode fazer</th></tr></thead>
+    <tbody>
+      <tr><td>Administrador</td><td><code>admin@prumo.dev</code></td><td>Tudo, incluindo membros e exclusão do quadro</td></tr>
+      <tr><td>Gerente</td><td><code>gerente@prumo.dev</code></td><td>Tarefas, colunas, etiquetas, limites WIP e automações</td></tr>
+      <tr><td>Membro</td><td><code>membro@prumo.dev</code></td><td>Criar, editar, mover e comentar tarefas</td></tr>
+      <tr><td>Visualizador</td><td><code>leitura@prumo.dev</code></td><td>Só consultar</td></tr>
+    </tbody>
+  </table>
+  <p>Todas usam a senha <code>Prumo@2026</code>. Os nomes são fictícios e os e-mails usam o domínio de exemplo <code>prumo.dev</code>.</p>
+
+  <h3 id="s-local">Modo local sem servidor</h3>
+  <p>Rode <code>npm run servir</code> na pasta do projeto e abra <code>http://localhost:5173</code>. O Prumo abre com o quadro de exemplo e grava cada alteração no navegador. Os dados ficam só naquele navegador e naquele computador. Para levá-los a outro lugar, use Menu, Exportar e importar.</p>
+  <div class="note"><b class="t">Papéis no modo local</b>O papel escolhido em Conta e sincronização muda só o que a tela mostra. A restrição só é aplicada quando o quadro está no servidor.</div>
+
+  <h3 id="s-semdocker">Servidor sem Docker</h3>
+  <pre>python -m venv .venv
+.venv\Scripts\activate           # Windows (Linux e macOS: source .venv/bin/activate)
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py seed            # contas e quadro de demonstração
+daphne -p 8000 prumo.asgi:application</pre>
+  <p>Sem variáveis de ambiente, o Django usa SQLite (<code>prumo.sqlite3</code>). Para usar PostgreSQL, defina <code>PRUMO_DB_ENGINE=postgresql</code> e as variáveis <code>PRUMO_DB_*</code> antes do <code>migrate</code>.</p>
+</section>
+
+<section class="chapter" id="c-uso">
+  <div class="chapter-head"><div class="num">Capítulo 4</div><h2>Usar o quadro</h2>
+    <p class="lede">Tudo o que você muda é salvo na hora. Cada passo pode ser desfeito com Ctrl+Z.</p></div>
+
+  <h3 id="u-tela">4.1 A tela principal</h3>
+  <table>
+    <thead><tr><th>Área</th><th>O que tem</th></tr></thead>
+    <tbody>
+      <tr><td>Barra superior</td><td>Logo, nome e descrição do quadro, abas Quadro, Lista, Calendário, Painel e Histórico, busca (<kbd>/</kbd>), Ir para (<kbd>Ctrl</kbd>+<kbd>K</kbd>), desfazer, refazer, notificações, tema e menu</td></tr>
+      <tr><td>Lateral</td><td>Quadros ativos com o total de tarefas, botão de novo quadro, arquivados, quem está online e a sua conta</td></tr>
+      <tr><td>Barra de filtros</td><td>Filtros rápidos com contagem, Mais filtros e, à direita, Automações, Membros e Configurar, conforme o papel</td></tr>
+      <tr><td>Rodapé</td><td>Situação do salvamento (Salvo neste navegador, Salvando…, Sincronizado ou Atualizado por …), a versão e o link Atalhos</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="u-quadros">4.2 Quadros e modelos</h3>
+  <ol class="steps">
+    <li>Clique em + ao lado de Quadros.</li>
+    <li>Dê um nome, escolha o modelo e a cor e clique em Criar quadro.</li>
+  </ol>
+  <table>
+    <thead><tr><th>Modelo</th><th>Colunas criadas, em ordem</th></tr></thead>
+    <tbody>
+      <tr><td>Kanban</td><td>Backlog, To Do, In Progress (WIP 3), Review (WIP 2), Done</td></tr>
+      <tr><td>Scrum</td><td>Product Backlog, Sprint Backlog, Em andamento (WIP 4), Teste (WIP 2), Pronto</td></tr>
+      <tr><td>Desenvolvimento</td><td>Ideias, Especificação, Desenvolvimento, Code Review, QA, Produção</td></tr>
+      <tr><td>Estudos</td><td>Para estudar, Estudando (WIP 2), Revisar, Aprendido</td></tr>
+      <tr><td>Gestão de projetos</td><td>Planejamento, Execução (WIP 5), Aprovação (WIP 3), Entregue</td></tr>
+    </tbody>
+  </table>
+  <p>Em Configurar você renomeia o quadro, muda a cor, edita as etiquetas e decide se dependências bloqueiam ou só avisam. Ali também ficam Duplicar, Arquivar e Excluir quadro. Quadros arquivados saem da lista principal e aparecem em Mostrar arquivados. Duplicar copia colunas, tarefas, etiquetas e automações e começa um histórico novo.</p>
+
+  <h3 id="u-colunas">4.3 Colunas, limites WIP e colunas recolhidas</h3>
+  <p>Clique em Nova coluna no fim do quadro. Para mudar a ordem, arraste o topo da coluna. O botão de três pontos abre o nome, o tipo da etapa e o limite WIP.</p>
+  <table>
+    <thead><tr><th>Tipo</th><th>Efeito</th></tr></thead>
+    <tbody>
+      <tr><td>Espera</td><td>A tarefa ainda não começou. Dependências pendentes não impedem a entrada.</td></tr>
+      <tr><td>Em andamento</td><td>A primeira entrada marca o início do cycle time.</td></tr>
+      <tr><td>Concluído</td><td>Marca a data de conclusão. Sair dela reabre a tarefa.</td></tr>
+    </tbody>
+  </table>
+  <p>Com limite WIP, o topo da coluna mostra um nível de bolha com uma régua embaixo e o contador no formato tarefas/limite. A régua tem uma marca numerada por vaga, e a bolha anda até a marca do total de tarefas. Quando falta uma vaga, a bolha ganha contorno latão. Quando a coluna lota, o tubo fica vermelho e a próxima tarefa é recusada com uma mensagem.</p>
+  <div class="nivel-demo">
+    <div class="n"><div class="tubo"><i style="left:6mm"></i></div><b>1 de 3: livre</b>A bolha anda até a marca do total.</div>
+    <div class="n"><div class="tubo"><i style="left:22mm"></i></div><b>2 de 3: falta uma vaga</b>A bolha ganha contorno latão.</div>
+    <div class="n cheio"><div class="tubo"><i style="left:38mm"></i></div><b>3 de 3: cheia</b>O tubo fica vermelho.</div>
+  </div>
+  <p>Enquanto você arrasta uma tarefa, a coluna de destino fica azulada; se estiver cheia, avermelhada. Limite 0 significa sem limite; nesse caso a coluna mostra Sem limite WIP. Excluir uma coluna leva as tarefas dela para a coluna anterior.</p>
+  <p><b>Recolher.</b> A seta à esquerda do nome encolhe a coluna numa faixa vertical com o nome e a contagem. Clique na faixa para abrir de novo. Uma coluna recolhida continua recebendo tarefas arrastadas (elas vão para o fim). A escolha fica salva no navegador, por quadro.</p>
+
+  <h3 id="u-tarefas">4.4 Tarefas e adição rápida</h3>
+  <p>Clique em Adicionar tarefa no pé da coluna (ou tecle <kbd>N</kbd>), escreva o título e tecle <kbd>Enter</kbd>. O campo continua aberto para a próxima tarefa. Marcações no título preenchem os campos na hora, e uma prévia mostra o que foi entendido antes de salvar:</p>
+  <table>
+    <thead><tr><th>Marcação</th><th>Preenche</th><th>Exemplos</th></tr></thead>
+    <tbody>
+      <tr><td><code>@nome</code></td><td>Responsável, pelo começo do nome de quem já está no quadro</td><td><code>@ana</code>, <code>@bruno_lima</code></td></tr>
+      <tr><td><code>#etiqueta</code></td><td>Etiqueta existente; use hífen no lugar do espaço</td><td><code>#bug</code>, <code>#nova-funcao</code></td></tr>
+      <tr><td><code>!prioridade</code></td><td>Urgente, alta, média ou baixa (ou só a inicial)</td><td><code>!alta</code>, <code>!u</code></td></tr>
+      <tr><td><code>&gt;prazo</code></td><td>Hoje, amanhã, dia da semana, data ou daqui a N dias</td><td><code>&gt;sexta</code>, <code>&gt;15/11</code>, <code>&gt;+3</code></td></tr>
+    </tbody>
+  </table>
+  <p>Marcações que não casam com nada aparecem na prévia como aviso e ficam fora do título. Automações da coluna rodam depois e podem completar ou trocar campos.</p>
+  <figure><img src="../images/tela-adicao-rapida.png"><figcaption><b>Figura 2</b> Adição rápida: <code>@bru #bug !alta &gt;sexta</code> vira responsável, etiqueta, prioridade e prazo.</figcaption></figure>
+  <p>Clique no card para abrir os detalhes.</p>
+  <figure><img src="../images/tela-tarefa.png"><figcaption><b>Figura 3</b> Janela da tarefa: conteúdo à esquerda; status, responsável, prioridade, datas e etiquetas à direita.</figcaption></figure>
+  <table>
+    <thead><tr><th>Campo</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td>Título e descrição</td><td>Salvos quando o campo perde o foco</td></tr>
+      <tr><td>Status</td><td>Move a tarefa para outra coluna, respeitando WIP e dependências</td></tr>
+      <tr><td>Responsável</td><td>Texto livre, com sugestões dos membros e de quem já tem tarefas</td></tr>
+      <tr><td>Prioridade</td><td>Urgente, alta, média ou baixa. No card, uma barra à esquerda: vermelha para urgente, latão para alta</td></tr>
+      <tr><td>Início e prazo</td><td>O prazo gera os selos Hoje e Atrasada, alimenta o calendário e as notificações</td></tr>
+      <tr><td>Etiquetas</td><td>Clique para ligar ou desligar. Gerentes criam etiquetas novas ali mesmo</td></tr>
+    </tbody>
+  </table>
+  <p>No pé da janela ficam Duplicar e Excluir. Excluir pede confirmação e pode ser desfeito com <kbd>Ctrl</kbd>+<kbd>Z</kbd>.</p>
+
+  <h3 id="u-arrastar">4.5 Arrastar, soltar e ações rápidas</h3>
+  <p>O Prumo usa só a API nativa do HTML5 (<code>dragstart</code>, <code>dragover</code>, <code>drop</code>, <code>dragend</code>). Enquanto você arrasta, uma linha azul marca onde a tarefa vai cair. Ao soltar, a função <code>moverCard</code> confere o limite WIP e as dependências, registra a movimentação, recalcula a ordem e roda as automações. Com filtros ativos, o arrastar continua funcionando.</p>
+  <table>
+    <thead><tr><th>Com a tarefa em foco</th><th>Ação</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>Alt</kbd> + <kbd>→</kbd> / <kbd>←</kbd></td><td>Próxima coluna / coluna anterior</td></tr>
+      <tr><td><kbd>Alt</kbd> + <kbd>↑</kbd> / <kbd>↓</kbd></td><td>Sobe ou desce na coluna</td></tr>
+      <tr><td><kbd>Enter</kbd></td><td>Abre a tarefa</td></tr>
+    </tbody>
+  </table>
+  <p><b>Ações rápidas.</b> Ao passar o mouse (ou com a tarefa em foco), o rodapé do card mostra Assumir, que põe você como responsável, e um botão com o nome da próxima coluna, que move a tarefa para lá respeitando WIP e dependências. No celular os botões ficam sempre visíveis.</p>
+  <p><b>Tarefas paradas.</b> Quando uma tarefa não concluída está há 5 dias ou mais na mesma coluna, o card ganha o selo com a ampulheta e o número de dias; a partir de 10 dias o selo fica vermelho. A contagem usa as movimentações da tarefa (ou a data de criação, se ela nunca saiu da coluna).</p>
+
+  <h3 id="u-detalhes">4.6 Subtarefas, anexos e comentários</h3>
+  <dl class="def">
+    <div class="item"><dt>Subtarefas</dt><dd>Escreva e clique em Adicionar. Marque a caixa para concluir. O card mostra feitas e total, com uma barra de progresso.</dd></div>
+    <div class="item"><dt>Anexos</dt><dd>Clique em Anexar arquivo ou arraste arquivos para dentro da janela. Imagens ganham miniatura. No modo local o limite é 2 MB por arquivo; com o servidor, o arquivo vai para o disco e o limite é <code>PRUMO_MAX_ANEXO_MB</code>.</dd></div>
+    <div class="item"><dt>Comentários</dt><dd>Escreva e clique em Comentar. Use <code>@Nome</code> para mencionar alguém; a pessoa recebe uma notificação.</dd></div>
+  </dl>
+
+  <h3 id="u-dep">4.7 Dependências</h3>
+  <ol class="steps">
+    <li>Abra a tarefa que precisa esperar outra.</li>
+    <li>Em Dependências, escolha a tarefa e clique em Vincular.</li>
+    <li>Enquanto a dependência não estiver numa coluna do tipo Concluído, o card leva a faixa zebrada no topo e o selo Bloqueada.</li>
+  </ol>
+  <p>Com Impedir que tarefas avancem ligado (o padrão), mover a tarefa para uma coluna que não seja de espera é recusado. Desligado, o Prumo só avisa. Vínculos que formariam um ciclo são recusados. Ao excluir uma tarefa, os vínculos que apontavam para ela somem.</p>
+
+  <h3 id="u-filtros">4.8 Busca e filtros rápidos</h3>
+  <p>A busca (tecla <kbd>/</kbd>) procura em título, descrição, responsável e subtarefas, sem diferenciar acentos nem maiúsculas. Com vários termos, todos precisam aparecer. Os filtros se somam à busca e valem no quadro, na lista e no calendário.</p>
+  <table>
+    <thead><tr><th>Filtro rápido</th><th>Mostra</th></tr></thead>
+    <tbody>
+      <tr><td>Minhas tarefas (<kbd>M</kbd>)</td><td>As tarefas em que você é responsável</td></tr>
+      <tr><td>Atrasadas</td><td>Prazo anterior a hoje e tarefa não concluída</td></tr>
+      <tr><td>Bloqueadas</td><td>Tarefas com dependências ainda não concluídas</td></tr>
+      <tr><td>Paradas há 5 dias</td><td>Tarefas não concluídas há 5 dias ou mais na mesma coluna</td></tr>
+      <tr><td>Mais filtros</td><td>Responsável (ou sem responsável), etiqueta, prioridade, prazo (atrasadas, hoje, próximos 7 dias, sem prazo) e status</td></tr>
+    </tbody>
+  </table>
+  <p>Cada botão mostra quantas tarefas ele traria e fica escuro quando está ligado. Um segundo clique desliga; Limpar desliga todos. Com filtros ativos, o contador das colunas mostra “1 de 2”.</p>
+  <figure><img src="../images/tela-filtros.png"><figcaption><b>Figura 4</b> Filtro Atrasadas ligado e a coluna Backlog recolhida.</figcaption></figure>
+
+  <h3 id="u-comandos">4.9 Ir para (Ctrl+K) e atalhos</h3>
+  <p><kbd>Ctrl</kbd>+<kbd>K</kbd> (ou o botão Ir para, no topo) abre uma caixa que encontra pelo nome qualquer tarefa do quadro, outro quadro, uma vista ou uma ação (nova tarefa, minhas tarefas, novo quadro, exportar, tema, atalhos). As setas escolhem, <kbd>Enter</kbd> abre e <kbd>Esc</kbd> fecha.</p>
+  <figure class="narrow"><img src="../images/tela-comandos.png"><figcaption><b>Figura 5</b> Ir para: “pag” encontra a tarefa do gateway de pagamento.</figcaption></figure>
+  <table>
+    <thead><tr><th>Tecla</th><th>Ação</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd></td><td>Desfazer / refazer</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Ir para tarefa, quadro, vista ou ação</td></tr>
+      <tr><td><kbd>/</kbd></td><td>Buscar</td></tr>
+      <tr><td><kbd>N</kbd></td><td>Nova tarefa na primeira coluna</td></tr>
+      <tr><td><kbd>M</kbd></td><td>Só as minhas tarefas (de novo para todas)</td></tr>
+      <tr><td><kbd>1</kbd> a <kbd>5</kbd></td><td>Quadro, lista, calendário, painel e histórico</td></tr>
+      <tr><td><kbd>?</kbd></td><td>Lista de atalhos</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="chapter" id="c-vistas">
+  <div class="chapter-head"><div class="num">Capítulo 5</div><h2>Vistas</h2>
+    <p class="lede">O mesmo quadro visto de cinco jeitos. As abas ficam no topo e as teclas 1 a 5 trocam de uma para outra.</p></div>
+  <h3 id="v-lista">5.1 Lista</h3>
+  <figure><img src="../images/tela-lista.png"><figcaption><b>Figura 6</b> Lista com todas as tarefas, ordenada por status.</figcaption></figure>
+  <p>Uma linha por tarefa, com título e etiquetas, status, responsável, prioridade, prazo e há quantos dias está na coluna. Clique no título de uma coluna da tabela para ordenar; de novo para inverter. Clique numa linha (ou <kbd>Enter</kbd> com ela em foco) para abrir a tarefa. Os filtros e a busca valem aqui.</p>
+  <h3 id="v-calendario">5.2 Calendário</h3>
+  <figure><img src="../images/tela-calendario.png"><figcaption><b>Figura 7</b> Calendário do mês com os prazos das tarefas.</figcaption></figure>
+  <p>Mostra as tarefas com prazo no mês, com a semana começando na segunda-feira. As setas trocam o mês e Hoje volta ao mês atual. Tarefas atrasadas ficam em vermelho e aparecem também numa lista abaixo da grade. Clique numa tarefa para abri-la.</p>
+  <h3 id="v-painel">5.3 Painel e métricas</h3>
+  <figure><img src="../images/tela-painel.png"><figcaption><b>Figura 8</b> Painel: indicadores, concluídas por semana, tarefas por coluna e fluxo cumulativo.</figcaption></figure>
+  <table>
+    <thead><tr><th>Indicador</th><th>Cálculo</th></tr></thead>
+    <tbody>
+      <tr><td>Concluídas e pendentes</td><td>Tarefas em coluna do tipo Concluído, e todas as outras</td></tr>
+      <tr><td>Atrasadas</td><td>Prazo anterior a hoje e tarefa não concluída</td></tr>
+      <tr><td>Lead time</td><td>Da criação até a conclusão (mediana e média, em dias)</td></tr>
+      <tr><td>Cycle time</td><td>Da primeira entrada numa coluna em andamento até a conclusão</td></tr>
+      <tr><td>Throughput</td><td>Média de tarefas concluídas por semana nas últimas 4 semanas</td></tr>
+      <tr><td>Fluxo cumulativo</td><td>Quantas tarefas estavam em cada coluna no fim de cada um dos últimos 14 dias, reconstruído pelas movimentações</td></tr>
+    </tbody>
+  </table>
+  <p>Os gráficos são SVG gerados em <code>web/js/ui/vistas.js</code>, sem bibliotecas. As fórmulas ficam em <code>web/js/metricas.js</code>; a idade na coluna, em <code>web/js/filtros.js</code>.</p>
+  <h3 id="v-historico">5.4 Histórico, desfazer e refazer</h3>
+  <figure><img src="../images/tela-historico.png"><figcaption><b>Figura 9</b> Histórico com as alterações do quadro de exemplo.</figcaption></figure>
+  <p>A aba Histórico lista as últimas 500 alterações do quadro com autor, ação e horário. A busca da barra filtra o histórico. Cada tarefa também mostra o próprio histórico. Desfazer e refazer guardam até 100 passos por aba do navegador; dá para desfazer qualquer operação, inclusive exclusões e importações. Quando outra pessoa altera o quadro no servidor, a pilha é zerada, para você não voltar por cima do trabalho dela.</p>
+</section>
+
+<section class="chapter" id="c-equipe">
+  <div class="chapter-head"><div class="num">Capítulo 6</div><h2>Equipe e automação</h2>
+    <p class="lede">Regras que fazem o trabalho repetitivo, avisos de prazo e menção, papéis por quadro e sincronização em tempo real.</p></div>
+  <h3 id="e-auto">6.1 Automações</h3>
+  <figure><img src="../images/tela-automacoes.png"><figcaption><b>Figura 10</b> Regras de automação do quadro de exemplo.</figcaption></figure>
+  <p>Uma regra tem um gatilho e uma ação. O gatilho é a tarefa entrar numa coluna ou ser criada nela; a coluna pode ser qualquer uma.</p>
+  <table>
+    <thead><tr><th>Ação</th><th>Valor</th></tr></thead>
+    <tbody>
+      <tr><td>Definir responsável</td><td>Nome da pessoa</td></tr>
+      <tr><td>Definir prioridade</td><td>Urgente, alta, média ou baixa</td></tr>
+      <tr><td>Adicionar etiqueta</td><td>Uma etiqueta do quadro</td></tr>
+      <tr><td>Mover para a coluna</td><td>A coluna de destino (respeita WIP)</td></tr>
+      <tr><td>Marcar todas as subtarefas</td><td>Não tem valor</td></tr>
+      <tr><td>Definir prazo em dias</td><td>Dias a partir de hoje</td></tr>
+    </tbody>
+  </table>
+  <p>Uma regra que move a tarefa pode disparar outras, até 3 níveis. Cada aplicação aparece no histórico com o autor Automação. O interruptor pausa a regra sem apagá-la.</p>
+  <h3 id="e-notif">6.2 Notificações</h3>
+  <p>O sino mostra quantas notificações não lidas existem. O Prumo verifica a cada minuto e a cada alteração: suas tarefas que vencem hoje ou estão atrasadas, comentários que mencionam você e atribuições ou alterações feitas por outras pessoas nas suas tarefas. Clique em Receber alertas do navegador para ver as notificações do sistema com a aba em segundo plano.</p>
+  <h3 id="e-papeis">6.3 Contas, papéis e tempo real</h3>
+  <table>
+    <thead><tr><th>Papel</th><th>Pode</th></tr></thead>
+    <tbody>
+      <tr><td>Administrador</td><td>Tudo: membros e papéis, excluir o quadro, colunas, etiquetas, automações, tarefas</td></tr>
+      <tr><td>Gerente</td><td>Colunas, limites WIP, etiquetas, automações, configurações e tarefas</td></tr>
+      <tr><td>Membro</td><td>Criar, editar, mover, comentar e anexar em tarefas</td></tr>
+      <tr><td>Visualizador</td><td>Só consultar (sem ações rápidas nem adição de tarefas)</td></tr>
+    </tbody>
+  </table>
+  <ol class="steps">
+    <li>Clique no seu nome no canto inferior esquerdo.</li>
+    <li>Em Entrar no servidor, use e-mail e senha. Na demonstração: <code>admin@prumo.dev</code> e <code>Prumo@2026</code>.</li>
+    <li>Os quadros do servidor aparecem com um ponto na lateral. Para enviar um quadro local, use Enviar para o servidor na mesma janela.</li>
+    <li>Abra o mesmo quadro em outro navegador, com outra conta: cada movimentação aparece na hora e a lateral mostra quem está online.</li>
+  </ol>
+  <p>Para dar acesso, o administrador abre Membros, informa o e-mail de uma conta existente e escolhe o papel. Contas novas são criadas com <code>python manage.py criarusuario --email ... --nome "..."</code>; com <code>--admin</code>, a conta vê todos os quadros.</p>
+  <div class="note"><b class="t">Conflitos</b>Quando duas pessoas salvam ao mesmo tempo, a segunda recebe a versão mais recente com o aviso “Outra pessoa alterou o quadro ao mesmo tempo”. Nada é sobrescrito sem ser visto.</div>
+  <h3 id="e-dados">6.4 Exportar e importar</h3>
+  <table>
+    <thead><tr><th>Opção</th><th>Resultado</th></tr></thead>
+    <tbody>
+      <tr><td>Este quadro em JSON</td><td>Arquivo completo e reimportável, com colunas, tarefas, etiquetas, automações e histórico</td></tr>
+      <tr><td>Tarefas em CSV</td><td>Uma linha por tarefa, UTF-8 com BOM, separador vírgula</td></tr>
+      <tr><td>Todos os quadros em JSON</td><td>Backup de tudo o que está no navegador</td></tr>
+    </tbody>
+  </table>
+  <p>Colunas do CSV, nesta ordem: <code>id, quadro, coluna, titulo, descricao, responsavel, prioridade, etiquetas, prazo, subtarefas_feitas, subtarefas_total, dependencias, criado_em, iniciado_em, concluido_em</code>. Etiquetas e dependências são separadas por <code>|</code>. Na importação, só <code>titulo</code> é obrigatório; o separador ponto e vírgula também é aceito, e colunas ou etiquetas que não existirem são criadas.</p>
+</section>
+
+<section class="chapter" id="c-ref">
+  <div class="chapter-head"><div class="num">Capítulo 7</div><h2>Referência</h2>
+    <p class="lede">API, relatórios pela linha de comando, variáveis de ambiente, onde mexer para personalizar e como testar.</p></div>
+  <h3 id="r-api">7.1 API REST e WebSocket</h3>
+  <p>Base: <code>/api/v1</code>. Envie <code>Authorization: Bearer &lt;token&gt;</code> em todas as rotas, exceto <code>/</code>, <code>/saude</code> e <code>/auth/entrar</code>. Erros vêm como <code>{"mensagem": "..."}</code>.</p>
+  <table class="routes">
+    <thead><tr><th>Método e rota</th><th>Corpo</th><th>Resposta</th></tr></thead>
+    <tbody>
+      <tr><td>POST /auth/entrar</td><td><code>{email, senha}</code></td><td><code>{token, usuario}</code></td></tr>
+      <tr><td>POST /auth/sair</td><td>Nenhum</td><td>Revoga o token</td></tr>
+      <tr><td>GET /auth/eu</td><td>Nenhum</td><td><code>{id, nome, email}</code></td></tr>
+      <tr><td>GET /quadros</td><td>Nenhum</td><td>Lista com id, nome, revisão e papel</td></tr>
+      <tr><td>POST /quadros</td><td><code>{dados}</code></td><td>201; 409 se o id já existir</td></tr>
+      <tr><td>GET /quadros/{id}</td><td>Nenhum</td><td><code>{revisao, papel, dados}</code></td></tr>
+      <tr><td>PUT /quadros/{id}</td><td><code>{revisao, dados, registros}</code></td><td><code>{revisao}</code>; 409 com a versão atual; 403 se o papel não permite</td></tr>
+      <tr><td>DELETE /quadros/{id}</td><td>Nenhum</td><td>Só administrador</td></tr>
+      <tr><td>GET /quadros/{id}/historico?limite=200</td><td>Nenhum</td><td>Registros com autor</td></tr>
+      <tr><td>GET /quadros/{id}/tarefas</td><td>Filtros na URL: <code>coluna</code>, <code>responsavel</code>, <code>etiqueta</code>, <code>prioridade</code></td><td>Tarefas em formato plano</td></tr>
+      <tr><td>GET|POST /quadros/{id}/membros</td><td><code>{email, papel}</code></td><td>Membro definido; papel <code>remover</code> tira o acesso</td></tr>
+      <tr><td>POST /quadros/{id}/anexos</td><td>multipart: <code>card</code>, <code>arquivo</code></td><td><code>{id, nome, tipo, tamanho, url}</code></td></tr>
+      <tr><td>GET /anexos/{id}</td><td>Nenhum</td><td>O arquivo</td></tr>
+    </tbody>
+  </table>
+  <p>WebSocket: conecte em <code>ws://servidor/ws/quadros/{id}/?token=...</code>. O servidor envia JSON:</p>
+  <pre>{"tipo": "quadro", "revisao": 8, "dados": {...}, "autor": "Bruno Lima"}
+{"tipo": "presenca", "usuarios": ["Ana Souza", "Carla Dias"]}
+{"tipo": "excluido"}</pre>
+  <pre>TOKEN=$(curl -s -X POST http://localhost:8080/api/v1/auth/entrar \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"gerente@prumo.dev","senha":"Prumo@2026"}' | jq -r .token)
+curl -s "http://localhost:8080/api/v1/quadros/qdr_demonstracao/tarefas?prioridade=urgente" \
+  -H "Authorization: Bearer $TOKEN"</pre>
+
+  <h3 id="r-rel">7.2 Relatórios em Node e Java</h3>
+  <p>Exporte o quadro em JSON e rode o relatório em JavaScript, que usa os mesmos módulos da interface. A ferramenta em Java lê o CSV exportado e não precisa de bibliotecas; o script compila na primeira vez.</p>
+  <pre>npm run relatorio -- quadro.json
+bash ferramentas/java/prumo.sh resumo tarefas.csv
+bash ferramentas/java/prumo.sh atrasadas tarefas.csv 2026-10-21
+bash ferramentas/java/prumo.sh responsaveis tarefas.csv
+ferramentas\java\prumo.cmd resumo tarefas.csv      # Windows</pre>
+  <table>
+    <thead><tr><th>Comando</th><th>Mostra</th></tr></thead>
+    <tbody>
+      <tr><td><code>resumo</code></td><td>Totais, tarefas por coluna com barra e pendentes por prioridade</td></tr>
+      <tr><td><code>atrasadas</code></td><td>Tarefas vencidas e não concluídas, da mais antiga para a mais nova</td></tr>
+      <tr><td><code>responsaveis</code></td><td>Concluídas e total por pessoa</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="r-cfg">7.3 Configuração</h3>
+  <p>As variáveis ficam no arquivo <code>.env</code> (modelo em <code>.env.example</code>) e são lidas por <code>prumo/settings.py</code>.</p>
+  <table class="cfg">
+    <thead><tr><th>Variável</th><th>Padrão</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td>PRUMO_PORT</td><td>8080</td><td>Porta no computador</td></tr>
+      <tr><td>PRUMO_SECRET_KEY</td><td>gerada</td><td>Chave do Django</td></tr>
+      <tr><td>PRUMO_DEBUG</td><td>false</td><td>Modo de depuração</td></tr>
+      <tr><td>PRUMO_ALLOWED_HOSTS</td><td>localhost,127.0.0.1,[::1]</td><td>Domínios aceitos</td></tr>
+      <tr><td>PRUMO_CSRF_TRUSTED_ORIGINS</td><td>vazio</td><td>Origens confiáveis atrás de proxy</td></tr>
+      <tr><td>PRUMO_HTTPS</td><td>false</td><td>Redireciona para HTTPS</td></tr>
+      <tr><td>PRUMO_SEED</td><td>true</td><td>Demonstração em banco vazio</td></tr>
+      <tr><td>PRUMO_DB_ENGINE</td><td>sqlite</td><td><code>postgresql</code> no Docker</td></tr>
+      <tr><td>PRUMO_DB_HOST, _PORT, _NAME, _USER, _PASSWORD</td><td>localhost, 5432, prumo, prumo, vazio</td><td>Conexão com o PostgreSQL</td></tr>
+      <tr><td>PRUMO_SQLITE_PATH</td><td>prumo.sqlite3</td><td>Arquivo do SQLite, quando não há PostgreSQL</td></tr>
+      <tr><td>PRUMO_REDIS_URL</td><td>vazio</td><td>Channel layer em Redis (várias instâncias)</td></tr>
+      <tr><td>PRUMO_MAX_ANEXO_MB</td><td>20</td><td>Tamanho máximo por anexo</td></tr>
+      <tr><td>PRUMO_MEDIA_ROOT</td><td>./anexos</td><td>Pasta dos anexos</td></tr>
+      <tr><td>PRUMO_TOKEN_HORAS</td><td>168</td><td>Validade do login</td></tr>
+      <tr><td>PRUMO_TIMEZONE</td><td>America/Sao_Paulo</td><td>Fuso horário</td></tr>
+      <tr><td>PRUMO_LOG_LEVEL</td><td>INFO</td><td>Nível do log no console</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="r-pers">7.4 Personalização</h3>
+  <table>
+    <thead><tr><th>Objetivo</th><th>Arquivo</th><th>Como</th></tr></thead>
+    <tbody>
+      <tr><td>Cores e temas</td><td><code>web/css/prumo.css</code></td><td>Altere as variáveis de <code>:root</code> (claro) e dos blocos <code>[data-theme="dark"]</code>; a grade do papel usa <code>--grade</code> e as raias, <code>--raia</code></td></tr>
+      <tr><td>Novo modelo de quadro</td><td><code>web/js/modelos.js</code></td><td>Adicione uma entrada em <code>MODELOS</code></td></tr>
+      <tr><td>Nova marcação da adição rápida</td><td><code>web/js/entrada.js</code></td><td>Trate o novo sinal em <code>interpretarEntrada</code> e escreva um teste em <code>tests/js/entrada.test.js</code></td></tr>
+      <tr><td>Novo filtro rápido</td><td><code>web/js/filtros.js</code> e <code>app.js</code></td><td>Campo em <code>FILTRO_VAZIO</code>, regra em <code>atendeFiltro</code> e o botão em <code>renderFiltros</code></td></tr>
+      <tr><td>Nova ação de automação</td><td><code>web/js/regras.js</code></td><td>Inclua o tipo em <code>DESCRICOES_ACAO</code>, trate-o em <code>executarAutomacoes</code> e crie o campo em <code>ui/dialogos.js</code></td></tr>
+      <tr><td>Nova métrica</td><td><code>web/js/metricas.js</code></td><td>Escreva a função pura e mostre em <code>renderizarPainel</code></td></tr>
+      <tr><td>Papéis</td><td><code>web/js/permissoes.js</code> e <code>prumo/views.py</code></td><td>Ajuste <code>CAPACIDADES</code> e o mínimo exigido em cada rota</td></tr>
+    </tbody>
+  </table>
+  <div class="fig-pair">
+    <figure><img src="../images/tela-escuro.png"><figcaption><b>Figura 11</b> Tema escuro.</figcaption></figure>
+  </div>
+  <figure class="narrow" style="width:46%"><img src="../images/tela-celular.png"><figcaption><b>Figura 12</b> Quadro e lista no celular.</figcaption></figure>
+
+  <h3 id="r-testes">7.5 Testes e manuais</h3>
+  <pre>npm test                          # 35 testes do núcleo
+python manage.py test prumo       # 20 testes da API e do WebSocket
+bash ferramentas/java/testar.sh   # ferramenta em Java</pre>
+  <p>O workflow <code>.github/workflows/ci.yml</code> roda os três conjuntos (o do Django com PostgreSQL 17) e monta a imagem Docker. Os testes novos cobrem a adição rápida (marcações, prazos por dia da semana, data e +N, avisos) e os filtros de bloqueadas e paradas.</p>
+  <p>Os dois PDFs saem de <code>docs/fonte/</code>, com as fontes de <code>web/fonts</code> e as capturas de <code>docs/images</code>:</p>
+  <pre>pip install weasyprint==70.0
+python docs/fonte/gerar_pdfs.py            # os dois
+python docs/fonte/gerar_pdfs.py manual     # só este manual</pre>
+</section>
+
+<section class="chapter" id="c-prob">
+  <div class="chapter-head"><div class="num">Capítulo 8</div><h2>Solução de problemas</h2>
+    <p class="lede">Os sintomas mais comuns e o que fazer.</p></div>
+  <table>
+    <thead><tr><th>Sintoma</th><th>Causa e solução</th></tr></thead>
+    <tbody>
+      <tr><td>Docker não encontrado</td><td>Instale o Docker Desktop e abra-o antes de rodar o <code>iniciar.cmd</code>.</td></tr>
+      <tr><td>A porta 8080 já está em uso</td><td>Troque <code>PRUMO_PORT</code> no <code>.env</code> e rode de novo.</td></tr>
+      <tr><td>Não aparece Entrar no servidor</td><td>A interface está sendo servida sem o Django (por exemplo, com <code>npm run servir</code>). Use a porta do Docker.</td></tr>
+      <tr><td>E-mail ou senha incorretos na demonstração</td><td>O seed só roda em banco vazio. Rode <code>docker compose exec web python manage.py seed</code>.</td></tr>
+      <tr><td>A tarefa não entra na coluna</td><td>A coluna está no limite WIP ou há dependências pendentes; a mensagem diz qual dos dois.</td></tr>
+      <tr><td>A adição rápida não reconheceu <code>@nome</code> ou <code>#etiqueta</code></td><td>A pessoa precisa ser membro ou já ter tarefas no quadro, e a etiqueta precisa existir. Use hífen no lugar do espaço.</td></tr>
+      <tr><td>Uma coluna sumiu</td><td>Ela está recolhida: procure a faixa vertical com o nome e clique nela.</td></tr>
+      <tr><td>Seu papel não permite essa alteração</td><td>Membros não mudam colunas, etiquetas nem automações. Peça ao administrador para mudar seu papel em Membros.</td></tr>
+      <tr><td>Anexo recusado no modo local</td><td>O arquivo passa de 2 MB. Use o servidor.</td></tr>
+      <tr><td>Os dados sumiram do navegador</td><td>Os dados do site foram limpos ou a janela era anônima. Faça backup com Todos os quadros em JSON.</td></tr>
+      <tr><td>O tempo real não atualiza atrás de um proxy</td><td>Libere o upgrade de WebSocket para <code>/ws/</code> e defina <code>PRUMO_ALLOWED_HOSTS</code>.</td></tr>
+      <tr><td>Fontes antigas ainda aparecem</td><td>Recarregue sem cache (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>) ou rode <code>docker compose up -d --build</code>.</td></tr>
+      <tr><td>Várias instâncias do servidor</td><td>Defina <code>PRUMO_REDIS_URL</code> para que todas compartilhem os eventos.</td></tr>
+    </tbody>
+  </table>
+</section>
+</body>
+</html>

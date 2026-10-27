@@ -6,7 +6,8 @@
   <meta name="description" content="Prumo: quadro Kanban interativo com arrastar e soltar, automações, limites WIP e métricas.">
   <title>Prumo</title>
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
-  <link rel="preload" href="fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/public-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/literata-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/prumo.css">
 </head>
 <body>
@@ -19,11 +20,13 @@
     </div>
     <nav class="vistas" role="tablist" aria-label="Visualização">
       <button role="tab" data-vista="quadro">Quadro</button>
+      <button role="tab" data-vista="lista">Lista</button>
       <button role="tab" data-vista="calendario">Calendário</button>
       <button role="tab" data-vista="painel">Painel</button>
       <button role="tab" data-vista="historico">Histórico</button>
     </nav>
-    <label class="busca"><span class="icone"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></span><input id="busca" type="search" placeholder="Buscar tarefas  /" aria-label="Buscar tarefas"></label>
+    <label class="busca"><span class="icone"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></span><input id="busca" type="search" placeholder="Buscar tarefas" aria-label="Buscar tarefas"><kbd>/</kbd></label>
+    <button class="botao-comandos" data-acao="comandos" title="Ir para tarefa, quadro, vista ou ação">Ir para… <kbd>Ctrl K</kbd></button>
     <div class="acoes-topo">
       <button id="botao-desfazer" class="botao-icone" data-acao="desfazer" aria-label="Desfazer"><span class="icone"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg></span></button>
       <button id="botao-refazer" class="botao-icone" data-acao="refazer" aria-label="Refazer"><span class="icone"><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h3"/></svg></span></button>
@@ -37,7 +40,7 @@
     <main class="principal">
       <div id="filtros" class="filtros" aria-label="Filtros"></div>
       <section id="vista" class="vista"></section>
-      <footer class="rodape"><span id="estado-sync">Salvo neste navegador</span><span>Prumo 1.1.0</span></footer>
+      <footer class="rodape"><span id="estado-sync">Salvo neste navegador</span><span>Prumo 1.1.0 <button class="link" data-acao="atalhos">Atalhos</button></span></footer>
     </main>
   </div>
   <dialog id="dialogo" class="dialogo"></dialog>

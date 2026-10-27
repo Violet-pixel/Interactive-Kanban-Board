@@ -1,0 +1,66 @@
+erDiagram
+    direction LR
+    auth_user ||--o{ prumo_quadro : "criou"
+    auth_user ||--o{ prumo_membro : "participa"
+    prumo_quadro ||--o{ prumo_membro : "tem"
+    prumo_quadro ||--o{ prumo_registro : "registra"
+    prumo_quadro ||--o{ prumo_anexo : "guarda"
+    auth_user |o--o{ prumo_registro : "autor"
+    auth_user |o--o{ prumo_anexo : "enviou"
+    auth_user ||--o{ prumo_token : "entra com"
+
+    auth_user {
+        integer id PK
+        varchar username "150"
+        varchar email "254"
+        varchar password "128"
+        boolean is_active
+        boolean is_superuser
+        timestamptz date_joined
+    }
+    prumo_quadro {
+        varchar id PK "40"
+        varchar nome "120"
+        boolean arquivado
+        integer revisao
+        jsonb dados
+        integer criado_por_id FK "NULL"
+        timestamptz criado_em
+        timestamptz atualizado_em
+    }
+    prumo_membro {
+        bigint id PK
+        varchar quadro_id FK "40"
+        integer usuario_id FK
+        varchar papel "20"
+        timestamptz adicionado_em
+    }
+    prumo_registro {
+        bigint id PK
+        varchar quadro_id FK "40"
+        integer usuario_id FK "NULL"
+        varchar cliente_id "40"
+        varchar autor "120"
+        varchar acao "60"
+        text detalhe
+        varchar card_id "40"
+        timestamptz em
+    }
+    prumo_anexo {
+        uuid id PK
+        varchar quadro_id FK "40"
+        varchar card_id "40"
+        varchar nome "255"
+        varchar tipo "120"
+        bigint tamanho
+        varchar arquivo "100"
+        integer enviado_por_id FK "NULL"
+        timestamptz enviado_em
+    }
+    prumo_token {
+        bigint id PK
+        integer usuario_id FK
+        varchar chave_hash UK "64"
+        timestamptz criado_em
+        timestamptz expira_em
+    }

@@ -1,5 +1,5 @@
-import { html, seguro, icone } from './dom.js';
-import { atendeFiltro, situacaoPrazo } from '../filtros.js';
+import { html, seguro, icone, corExibida } from './dom.js';
+import { atendeFiltro, situacaoPrazo, diasNaColuna } from '../filtros.js';
 import { resumo, temposDeFluxo, vazaoSemanal, porColuna, porResponsavel, porPrioridade, fluxoCumulativo } from '../metricas.js';
 import { dataIso, formatarDataHora, nomePrioridade, lerDataLocal } from '../util.js';
 import { colunaDe } from '../regras.js';
@@ -141,3 +141,58 @@ export const renderizarHistorico = (alvo, ctx) => {
 };
 
 export const htmlNotificacoes = (notificacoes) => html`<ul class="notificacoes">${notificacoes.map((n) => html`<li class="${n.lida ? '' : 'nao-lida'}"><button class="link" data-quadro="${n.quadroId}" data-card="${n.cardId ?? ''}">${icone(n.tipo === 'prazo' ? 'relogio' : n.tipo === 'mencao' ? 'balao' : 'usuario')}${n.texto}</button><span class="discreto">${formatarDataHora(n.em)}</span></li>`)}</ul>${!notificacoes.length ? html`<p class="discreto">Nenhuma notificação.</p>` : ''}`;
+
+// Lista: todas as tarefas do quadro numa tabela que ordena por qualquer coluna.
+const ORDENS = {
+  titulo: (a, b) => a.titulo.localeCompare(b.titulo, 'pt-BR'),
+  coluna: (a, b, q) => q.colunas.findIndex((c) => c.id === a.colunaId) - q.colunas.findIndex((c) => c.id === b.colunaId) || a.ordem - b.ordem,
+  responsavel: (a, b) => (a.responsavel || '~').localeCompare(b.responsavel || '~', 'pt-BR'),
+  prioridade: (a, b) => (PESO[b.prioridade] ?? 0) - (PESO[a.prioridade] ?? 0),
+  prazo: (a, b) => (a.prazo || '9999').localeCompare(b.prazo || '9999'),
+  parada: (a, b) => diasNaColuna(b) - diasNaColuna(a)
+};
+const PESO = { urgente: 4, alta: 3, media: 2, baixa: 1 };
+
+export const renderizarLista = (alvo, ctx) => {
+  const quadro = ctx.loja.quadro;
+  const ordem = ctx.ordemLista ?? { campo: 'coluna', inverso: false };
+  const cards = quadro.cards.filter((c) => atendeFiltro(quadro, c, ctx.filtro)).sort((a, b) => ORDENS[ordem.campo](a, b, quadro) * (ordem.inverso ? -1 : 1));
+  const th = (campo, rotulo) => html`<th scope="col" aria-sort="${ordem.campo === campo ? (ordem.inverso ? 'descending' : 'ascending') : 'none'}"><button class="ordenar" data-ordenar="${campo}">${rotulo}${ordem.campo === campo ? (ordem.inverso ? ' ↓' : ' ↑') : ''}</button></th>`;
+  alvo.innerHTML = html`<div class="lista-tarefas">
+    <div class="historico-topo"><h2>Lista de tarefas</h2><span class="discreto">${cards.length} de ${quadro.cards.length} tarefa(s). Clique no título de uma coluna da tabela para ordenar.</span></div>
+    <div class="tabela-rolagem"><table class="tabela">
+      <thead><tr>${th('titulo', 'Tarefa')}${th('coluna', 'Status')}${th('responsavel', 'Responsável')}${th('prioridade', 'Prioridade')}${th('prazo', 'Prazo')}${th('parada', 'Na coluna há')}</tr></thead>
+      <tbody>${cards.map((c) => {
+        const col = colunaDe(quadro, c.colunaId);
+        const prazo = situacaoPrazo(quadro, c);
+        const dias = col?.tipo === 'concluido' ? null : diasNaColuna(c);
+        return html`<tr data-card="${c.id}" tabindex="0">
+          <td class="col-titulo">${c.titulo}${c.etiquetas.length ? html`<span class="mini-etiquetas">${c.etiquetas.map((id) => quadro.etiquetas.find((e) => e.id === id)).filter(Boolean).map((e) => html`<span class="etiqueta" style="--cor:${corExibida(e.cor)}">${e.nome}</span>`)}</span>` : ''}</td>
+          <td>${col?.nome ?? ''}</td>
+          <td>${c.responsavel || html`<span class="discreto">Ninguém</span>`}</td>
+          <td><span class="prioridade-texto prioridade-${c.prioridade}">${nomePrioridade(c.prioridade)}</span></td>
+          <td class="${prazo === 'atrasado' ? 'texto-atrasado' : ''}">${c.prazo ? formatarDataCurta(c.prazo) : html`<span class="discreto">Sem prazo</span>`}</td>
+          <td class="numero">${dias === null ? html`<span class="discreto">Concluída</span>` : `${dias} d`}</td>
+        </tr>`;
+      })}</tbody>
+    </table></div>
+    ${!cards.length ? html`<p class="discreto">Nenhuma tarefa com esses filtros.</p>` : ''}
+  </div>`;
+  const raiz = alvo.querySelector('.lista-tarefas');
+  raiz.addEventListener('click', (ev) => {
+    const o = ev.target.closest('[data-ordenar]');
+    if (o) {
+      ctx.ordemLista = { campo: o.dataset.ordenar, inverso: ordem.campo === o.dataset.ordenar ? !ordem.inverso : false };
+      ctx.atualizar();
+      return;
+    }
+    const linha = ev.target.closest('[data-card]');
+    if (linha) ctx.abrirCard(linha.dataset.card);
+  });
+  raiz.addEventListener('keydown', (ev) => {
+    const linha = ev.target.closest('tr[data-card]');
+    if (linha && ev.key === 'Enter') ctx.abrirCard(linha.dataset.card);
+  });
+};
+
+const formatarDataCurta = (texto) => lerDataLocal(texto)?.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }).replace('.', '') ?? '';

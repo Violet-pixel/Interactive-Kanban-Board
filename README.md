@@ -21,6 +21,22 @@ Feito com JavaScript (módulos ES e Drag and Drop nativo), HTML5 e CSS3 na inter
 - [`Manual-Prumo.pdf`](Manual-Prumo.pdf) ([cópia em `docs/`](docs/Manual-Prumo.pdf)): instalação, cada tela, arrastar e soltar, automações, limites WIP, dependências, permissões, métricas, importação e exportação, API, ferramenta em Java, configuração e solução de problemas, passo a passo.
 - [`Banco-de-Dados-Prumo.pdf`](Banco-de-Dados-Prumo.pdf): diagrama de relacionamentos, todas as tabelas com campos, tipos, chaves e restrições, formato JSON do quadro, controle de revisões, consultas prontas e preparação do PostgreSQL.
 
+## Novidades da interface
+
+Esta rodada mexe só na interface. API, formato JSON e banco continuam iguais aos da 1.1.0.
+
+- Mesa de obra: o quadro fica sobre papel milimetrado, cada coluna é uma raia e as tarefas são fichas com o título em Literata. O logo virou um prumo de pedreiro.
+- Tipografia igual à do Lume: Literata nos títulos e nas tarefas, Public Sans na interface e IBM Plex Mono nos números.
+- Adição rápida: `Revisar contrato @ana #bug !alta >sexta` já preenche responsável, etiqueta, prioridade e prazo, com prévia antes de salvar.
+- Filtros rápidos com contagem (Minhas tarefas, Atrasadas, Bloqueadas, Paradas há 5 dias) no lugar dos cinco seletores; o resto fica em Mais filtros.
+- Selo de tarefa parada há 5 dias ou mais na mesma coluna e ações rápidas no card (Assumir e mover para a próxima coluna).
+- Colunas recolhidas, vista Lista ordenável e Ir para (`Ctrl` + `K`) para achar qualquer tarefa, quadro, vista ou ação.
+- Manuais em PDF refeitos; o HTML deles agora fica em `docs/fonte/`.
+
+<p align="center">
+  <img src="docs/images/tela-adicao-rapida.png" alt="Adição rápida com responsável, etiqueta, prioridade e prazo preenchidos pelo título">
+</p>
+
 ## Novidades da 1.1.0
 
 A 1.1.0 muda só a aparência. API, formato JSON e banco continuam iguais aos da 1.0.0.
@@ -29,7 +45,7 @@ A 1.1.0 muda só a aparência. API, formato JSON e banco continuam iguais aos da
 - O limite WIP aparece como um nível de bolha com régua no topo da coluna, que fica vermelho quando a coluna lota. Colunas sem limite mostram “Sem limite WIP”.
 - Tarefa bloqueada tem uma faixa zebrada no topo; prioridade urgente ou alta aparece como uma barra à esquerda do card.
 - Os seletores de cor mostram nomes (“Azul linha de giz”, “Latão”) em vez de códigos hexadecimais.
-- Tipografia nova: Schibsted Grotesk na interface e Source Serif 4 nos textos longos, com as fontes dentro do projeto.
+- Tipografia nova: Schibsted Grotesk na interface e Source Serif 4 nos textos longos (trocadas depois pelas fontes do Lume).
 - Capturas de tela e manuais em PDF refeitos.
 
 ## Ver rodando
@@ -102,10 +118,12 @@ O quadro guarda cada alteração na hora. Com ele você pode:
 - criar, editar, duplicar, arquivar, restaurar e excluir quadros, cada um com nome, descrição, cor, colunas, etiquetas, membros e automações próprios;
 - começar de um modelo: Kanban (Backlog, To Do, In Progress, Review e Done), Scrum, Desenvolvimento, Estudos ou Gestão de projetos;
 - adicionar, renomear e reordenar colunas arrastando o topo. Cada coluna tem um tipo (espera, em andamento ou concluído) que alimenta as métricas;
-- arrastar tarefas entre colunas e dentro delas usando só a API de arrastar e soltar do HTML5, ou `Alt` + setas pelo teclado;
+- arrastar tarefas entre colunas e dentro delas usando só a API de arrastar e soltar do HTML5, ou `Alt` + setas pelo teclado, e recolher colunas que não estão em uso;
+- criar tarefas com marcações no título (`@pessoa`, `#etiqueta`, `!prioridade`, `>prazo`) e usar as ações rápidas do card para assumir ou avançar a tarefa;
 - preencher título, descrição, responsável, prioridade (urgente, alta, média, baixa), status, início e prazo, e dividir a tarefa em subtarefas com barra de progresso;
 - ver os prazos no calendário do mês, com a lista de atrasadas e os selos “Hoje” e “Atrasada” nos cards;
-- buscar por texto e filtrar por responsável, etiqueta, prioridade, prazo (atrasadas, hoje, próximos 7 dias, sem prazo) e status, tudo combinado;
+- buscar por texto, usar os filtros rápidos (minhas, atrasadas, bloqueadas, paradas há 5 dias) e filtrar por responsável, etiqueta, prioridade, prazo e status, tudo combinado;
+- ver tudo numa lista ordenável e ir para qualquer tarefa, quadro, vista ou ação com `Ctrl` + `K`;
 - anexar imagens, documentos ou qualquer arquivo: até 2 MB por arquivo no modo local, dentro do navegador; até 20 MB (configurável) em disco com o servidor;
 - comentar e mencionar alguém com `@nome`;
 - consultar o histórico de criações, movimentações, edições, comentários e regras aplicadas, com autor e horário, no quadro e em cada tarefa;
@@ -128,15 +146,18 @@ Para equipes e para acompanhar o fluxo:
 | <img src="docs/images/tela-tarefa.png" alt="Tarefa aberta com subtarefas, dependências, anexos, comentários e histórico"> | <img src="docs/images/tela-painel.png" alt="Painel com indicadores, concluídas por semana e fluxo cumulativo"> |
 | <img src="docs/images/tela-calendario.png" alt="Calendário do mês com os prazos"> | <img src="docs/images/tela-automacoes.png" alt="Regras de automação"> |
 | <img src="docs/images/tela-historico.png" alt="Histórico de alterações do quadro"> | <img src="docs/images/tela-escuro.png" alt="Quadro no tema escuro"> |
+| <img src="docs/images/tela-lista.png" alt="Lista de tarefas ordenável"> | <img src="docs/images/tela-comandos.png" alt="Ir para, com Ctrl K"> |
 
 ### Atalhos
 
 | Tecla | Ação |
 |---|---|
 | `Ctrl` + `Z` / `Ctrl` + `Y` | Desfazer / refazer |
+| `Ctrl` + `K` | Ir para tarefa, quadro, vista ou ação |
 | `/` | Buscar |
 | `N` | Nova tarefa na primeira coluna |
-| `1` a `4` | Quadro, calendário, painel e histórico |
+| `M` | Só as minhas tarefas |
+| `1` a `5` | Quadro, lista, calendário, painel e histórico |
 | `Enter` | Abrir a tarefa em foco |
 | `Alt` + `←` `→` | Mover a tarefa entre colunas |
 | `Alt` + `↑` `↓` | Mudar a ordem na coluna |
@@ -171,7 +192,7 @@ flowchart LR
 
 | Camada | Onde | O que faz |
 |---|---|---|
-| Núcleo | `web/js/regras.js`, `estado.js`, `metricas.js`, `filtros.js`, `csv.js` | Regras do Kanban (mover, WIP, dependências, automações), estado com desfazer e refazer, métricas, filtros e conversão JSON/CSV. Funções puras, testadas no Node |
+| Núcleo | `web/js/regras.js`, `estado.js`, `metricas.js`, `filtros.js`, `entrada.js`, `csv.js` | Regras do Kanban (mover, WIP, dependências, automações), estado com desfazer e refazer, métricas, filtros e conversão JSON/CSV. Funções puras, testadas no Node |
 | Interface | `web/js/ui/`, `web/css/prumo.css`, `web/index.html` | Quadro com Drag and Drop, janela da tarefa, calendário, painel, histórico e diálogos |
 | Sincronização | `web/js/api.js`, `web/js/app.js` | Cliente REST com token, salvamento com revisão, WebSocket com reconexão automática |
 | API | `prumo/views.py`, `prumo/urls.py` | Django sem frameworks extras: autenticação por token, papéis por quadro, revisão otimista e histórico com autor |
@@ -209,10 +230,11 @@ Interactive-Kanban-Board/
 │       ├── regras.js            mover, WIP, dependências, automações, histórico
 │       ├── estado.js            loja com desfazer/refazer e localStorage
 │       ├── metricas.js          lead time, cycle time, throughput, fluxo cumulativo
+│       ├── entrada.js           adição rápida (@pessoa #etiqueta !prioridade >prazo)
 │       ├── filtros.js, csv.js, notificacoes.js, permissoes.js, modelos.js
 │       ├── api.js               cliente REST e WebSocket
 │       ├── app.js               inicialização, atalhos e sincronização
-│       └── ui/                  quadro, tarefa, vistas e diálogos
+│       └── ui/                  quadro, tarefa, vistas, diálogos e Ir para (comandos.js)
 ├── prumo/                       servidor Django
 │   ├── models.py                Quadro, Membro, Registro, Anexo e Token
 │   ├── views.py, urls.py        API REST
@@ -223,7 +245,7 @@ Interactive-Kanban-Board/
 ├── scripts/                     servidor local, relatório em Node e utilitários
 ├── tests/js/                    testes do núcleo (node --test)
 ├── exemplos/                    quadro de demonstração em JSON
-├── docs/                        manuais em PDF e imagens
+├── docs/                        manuais em PDF, imagens e fonte/ (HTML que gera os PDFs)
 └── docker-compose.yml
 ```
 
@@ -271,7 +293,8 @@ Todas as variáveis ficam no arquivo `.env` (modelo em [`.env.example`](.env.exa
 
 | Para | Onde mexer |
 |---|---|
-| Mudar as cores | Variáveis no topo de `web/css/prumo.css` (tema claro e escuro) |
+| Mudar as cores | Variáveis no topo de `web/css/prumo.css` (tema claro e escuro; a grade do papel usa `--grade`) |
+| Criar uma marcação da adição rápida | `interpretarEntrada` em `web/js/entrada.js` |
 | Criar um modelo de quadro | `MODELOS` em `web/js/modelos.js` |
 | Criar uma ação de automação | `DESCRICOES_ACAO` e `executarAutomacoes` em `web/js/regras.js`, e o campo em `web/js/ui/dialogos.js` |
 | Adicionar uma métrica | `web/js/metricas.js` e `renderizarPainel` em `web/js/ui/vistas.js` |
@@ -286,14 +309,16 @@ python manage.py test prumo                # API, permissões e WebSocket (SQLit
 bash ferramentas/java/testar.sh            # ferramenta em Java
 ```
 
-São 31 testes do núcleo (mover, WIP, dependências e ciclos, automações em cadeia, desfazer e refazer, métricas, filtros, notificações, CSV e JSON, cliente da API) e 20 do servidor (login, tokens, revisão e conflito, papéis, membros, anexos e WebSocket). O workflow [`ci.yml`](.github/workflows/ci.yml) roda tudo, com PostgreSQL 17, a cada envio.
+São 35 testes do núcleo (mover, WIP, dependências e ciclos, automações em cadeia, desfazer e refazer, métricas, filtros, adição rápida, notificações, CSV e JSON, cliente da API) e 20 do servidor (login, tokens, revisão e conflito, papéis, membros, anexos e WebSocket). O workflow [`ci.yml`](.github/workflows/ci.yml) roda tudo, com PostgreSQL 17, a cada envio.
 
 ### Gerar os manuais
 
-Os PDFs saem de `.design/docs-src/` (HTML, `print.css` e fontes). Com Python, `playwright` e `pypdf` instalados:
+Os PDFs saem de `docs/fonte/` (HTML e CSS, com as fontes de `web/fonts`). Com Python e o WeasyPrint:
 
 ```bash
-python .design/docs-src/render.py
+pip install weasyprint==70.0
+python docs/fonte/gerar_pdfs.py            # os dois
+python docs/fonte/gerar_pdfs.py manual     # só o manual
 ```
 
 O script grava `Manual-Prumo.pdf` e `Banco-de-Dados-Prumo.pdf` na raiz e em `docs/`, usando as capturas de `docs/images/`.

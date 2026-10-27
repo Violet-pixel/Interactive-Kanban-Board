@@ -332,12 +332,15 @@ export const dialogoAtalhos = () => abrirDialogo({
   corpo: html`<dl class="atalhos">
     <dt><kbd>Ctrl</kbd> + <kbd>Z</kbd></dt><dd>Desfazer</dd>
     <dt><kbd>Ctrl</kbd> + <kbd>Y</kbd> ou <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd></dt><dd>Refazer</dd>
+    <dt><kbd>Ctrl</kbd> + <kbd>K</kbd></dt><dd>Ir para qualquer tarefa, quadro, vista ou ação</dd>
     <dt><kbd>/</kbd></dt><dd>Buscar</dd>
     <dt><kbd>N</kbd></dt><dd>Nova tarefa na primeira coluna</dd>
-    <dt><kbd>1</kbd> a <kbd>4</kbd></dt><dd>Quadro, calendário, painel e histórico</dd>
+    <dt><kbd>M</kbd></dt><dd>Mostrar só as minhas tarefas (de novo para todas)</dd>
+    <dt><kbd>1</kbd> a <kbd>5</kbd></dt><dd>Quadro, lista, calendário, painel e histórico</dd>
     <dt><kbd>Enter</kbd></dt><dd>Abrir a tarefa em foco</dd>
     <dt><kbd>Alt</kbd> + <kbd>←</kbd> <kbd>→</kbd></dt><dd>Mover a tarefa em foco entre colunas</dd>
     <dt><kbd>Alt</kbd> + <kbd>↑</kbd> <kbd>↓</kbd></dt><dd>Mudar a ordem na coluna</dd>
+    <dt><kbd>@</kbd> <kbd>#</kbd> <kbd>!</kbd> <kbd>&gt;</kbd></dt><dd>Ao criar uma tarefa: responsável, etiqueta, prioridade e prazo (ex.: <code>Revisar @ana #bug !alta &gt;sexta</code>)</dd>
     <dt><kbd>?</kbd></dt><dd>Esta lista</dd>
   </dl>`
 });

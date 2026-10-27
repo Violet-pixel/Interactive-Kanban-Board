@@ -1,20 +1,21 @@
 import { Loja } from './estado.js';
 import { ClienteApi } from './api.js';
-import { FILTRO_VAZIO, filtroAtivo, responsaveisDo } from './filtros.js';
+import { FILTRO_VAZIO, filtroAtivo, responsaveisDo, atendeFiltro } from './filtros.js';
 import { gerarNotificacoes } from './notificacoes.js';
 import { pode, nomePapel } from './permissoes.js';
 import { PRIORIDADES, debounce } from './util.js';
 import { $, $$, html, seguro, icone, avisar, abrirDialogo, LOGO, corExibida } from './ui/dom.js';
 import { renderizarQuadro } from './ui/quadro.js';
 import { abrirCard } from './ui/card.js';
-import { renderizarCalendario, renderizarPainel, renderizarHistorico, htmlNotificacoes } from './ui/vistas.js';
+import { renderizarCalendario, renderizarPainel, renderizarHistorico, renderizarLista, htmlNotificacoes } from './ui/vistas.js';
+import { abrirComandos } from './ui/comandos.js';
 import { dialogoNovoQuadro, dialogoEditarQuadro, dialogoAutomacoes, dialogoMembros, dialogoDados, dialogoConta, dialogoAtalhos } from './ui/dialogos.js';
 
 const armazenamento = (() => { try { return window.localStorage; } catch { return null; } })();
 const loja = new Loja(armazenamento);
 const api = new ClienteApi({ armazenamento });
 const remotos = new Map();
-const VISTAS = ['quadro', 'calendario', 'painel', 'historico'];
+const VISTAS = ['quadro', 'lista', 'calendario', 'painel', 'historico'];
 
 const ctx = {
   loja,
@@ -27,6 +28,8 @@ const ctx = {
   modoServidor: () => api.conectado && remotos.has(loja.quadro?.id),
   papel: () => (ctx.modoServidor() ? remotos.get(loja.quadro.id).papel : loja.estado.usuario.papel),
   abrirCard: (id) => abrirCard(id, ctx),
+  usuarioNome: () => (api.conectado ? api.sessao.usuario.nome : loja.estado.usuario.nome),
+  irPara: (vista) => { ctx.vista = vista; history.replaceState(null, '', `#${vista}`); render(); },
   atualizar: () => render()
 };
 
@@ -57,16 +60,32 @@ const opcoes = (lista, atual) => lista.map(([v, n]) => html`<option value="${v}"
 const renderFiltros = () => {
   const q = loja.quadro;
   const f = ctx.filtro;
+  const eu = ctx.usuarioNome();
+  const chip = (ativo, acao, rotulo, extra = '') => html`<button class="chip ${ativo ? 'chip-ativo' : ''}" aria-pressed="${ativo ? 'true' : 'false'}" data-rapido="${acao}">${rotulo}${seguro(extra)}</button>`;
+  const contar = (filtro) => q.cards.filter((c) => atendeFiltro(q, c, { ...FILTRO_VAZIO, ...filtro })).length;
+  const extras = [f.etiqueta, f.prioridade, f.colunaId, f.prazo && !['atrasado'].includes(f.prazo) ? f.prazo : '', f.responsavel && f.responsavel !== eu ? f.responsavel : ''].filter(Boolean).length;
   $('#filtros').innerHTML = html`
-    <select id="filtro-responsavel" data-filtro="responsavel" aria-label="Responsável"><option value="">Responsável</option><option value="__sem__" ${seguro(f.responsavel === '__sem__' ? 'selected' : '')}>Sem responsável</option>${opcoes(responsaveisDo(q).map((n) => [n, n]), f.responsavel)}</select>
-    <select id="filtro-etiqueta" data-filtro="etiqueta" aria-label="Etiqueta"><option value="">Etiqueta</option>${opcoes(q.etiquetas.map((e) => [e.id, e.nome]), f.etiqueta)}</select>
-    <select id="filtro-prioridade" data-filtro="prioridade" aria-label="Prioridade"><option value="">Prioridade</option>${opcoes(PRIORIDADES.map((p) => [p.id, p.nome]), f.prioridade)}</select>
-    <select id="filtro-prazo" data-filtro="prazo" aria-label="Prazo"><option value="">Prazo</option>${opcoes([['atrasado', 'Atrasadas'], ['hoje', 'Vencem hoje'], ['semana', 'Próximos 7 dias'], ['sem', 'Sem prazo']], f.prazo)}</select>
-    <select id="filtro-coluna" data-filtro="colunaId" aria-label="Status"><option value="">Status</option>${opcoes(q.colunas.map((c) => [c.id, c.nome]), f.colunaId)}</select>
-    ${filtroAtivo(f) ? html`<button class="link" data-acao="limpar-filtros">Limpar filtros</button>` : ''}
+    <div class="chips" role="group" aria-label="Filtros rápidos">
+      ${chip(f.responsavel === eu, 'minhas', 'Minhas tarefas', `<span class="n">${contar({ responsavel: eu })}</span>`)}
+      ${chip(f.prazo === 'atrasado', 'atrasadas', 'Atrasadas', `<span class="n">${contar({ prazo: 'atrasado' })}</span>`)}
+      ${chip(f.bloqueio === 'bloqueadas', 'bloqueadas', 'Bloqueadas', `<span class="n">${contar({ bloqueio: 'bloqueadas' })}</span>`)}
+      ${chip(f.parada === '5', 'paradas', 'Paradas há 5 dias', `<span class="n">${contar({ parada: '5' })}</span>`)}
+      <details class="mais-filtros" ${seguro(ctx.filtrosAbertos ? 'open' : '')}>
+        <summary class="chip ${extras ? 'chip-ativo' : ''}">Mais filtros${extras ? html` <span class="n">${extras}</span>` : ''}</summary>
+        <div class="painel-filtros">
+          <label class="campo"><span>Responsável</span><select id="filtro-responsavel" data-filtro="responsavel"><option value="">Todos</option><option value="__sem__" ${seguro(f.responsavel === '__sem__' ? 'selected' : '')}>Sem responsável</option>${opcoes(responsaveisDo(q).map((n) => [n, n]), f.responsavel)}</select></label>
+          <label class="campo"><span>Etiqueta</span><select id="filtro-etiqueta" data-filtro="etiqueta"><option value="">Todas</option>${opcoes(q.etiquetas.map((e) => [e.id, e.nome]), f.etiqueta)}</select></label>
+          <label class="campo"><span>Prioridade</span><select id="filtro-prioridade" data-filtro="prioridade"><option value="">Todas</option>${opcoes(PRIORIDADES.map((p) => [p.id, p.nome]), f.prioridade)}</select></label>
+          <label class="campo"><span>Prazo</span><select id="filtro-prazo" data-filtro="prazo"><option value="">Qualquer</option>${opcoes([['atrasado', 'Atrasadas'], ['hoje', 'Vencem hoje'], ['semana', 'Próximos 7 dias'], ['sem', 'Sem prazo']], f.prazo)}</select></label>
+          <label class="campo"><span>Status</span><select id="filtro-coluna" data-filtro="colunaId"><option value="">Todos</option>${opcoes(q.colunas.map((c) => [c.id, c.nome]), f.colunaId)}</select></label>
+        </div>
+      </details>
+      ${filtroAtivo(f) ? html`<button class="link" data-acao="limpar-filtros">Limpar</button>` : ''}
+    </div>
     <span class="espaco"></span>
     ${pode(ctx.papel(), 'automacoes') ? html`<button class="botao pequeno" data-acao="automacoes">${icone('raio')}Automações <span class="discreto">${q.automacoes.filter((a) => a.ativa !== false).length}</span></button>` : ''}
     ${pode(ctx.papel(), 'configurar') ? html`<button class="botao pequeno" data-acao="membros">Membros <span class="discreto">${(q.membros ?? []).length}</span></button><button class="botao pequeno" data-acao="configurar">Configurar</button>` : ''}`;
+  $('#filtros .mais-filtros').addEventListener('toggle', (ev) => { ctx.filtrosAbertos = ev.target.open; });
 };
 
 const renderTopo = () => {
@@ -96,6 +115,7 @@ const render = () => {
   if (ctx.vista === 'calendario') renderizarCalendario(alvo, ctx);
   else if (ctx.vista === 'painel') renderizarPainel(alvo, ctx);
   else if (ctx.vista === 'historico') renderizarHistorico(alvo, ctx);
+  else if (ctx.vista === 'lista') renderizarLista(alvo, ctx);
   else renderizarQuadro(alvo, ctx);
 };
 
@@ -208,6 +228,7 @@ loja.assinar((estado, motivo) => {
 
 const acoes = {
   'novo-quadro': () => dialogoNovoQuadro(ctx),
+  comandos: () => abrirComandos(ctx, acoes),
   configurar: () => dialogoEditarQuadro(ctx),
   automacoes: () => dialogoAutomacoes(ctx),
   membros: () => dialogoMembros(ctx),
@@ -269,7 +290,16 @@ document.addEventListener('click', (ev) => {
   const vista = ev.target.closest('[data-vista]');
   if (acao) acoes[acao.dataset.acao]?.();
   else if (quadro) { loja.selecionarQuadro(quadro.dataset.quadro); ctx.filtro = { ...FILTRO_VAZIO, texto: ctx.filtro.texto }; assinarAtivo(); document.body.classList.remove('lateral-aberta'); }
-  else if (vista) { ctx.vista = vista.dataset.vista; history.replaceState(null, '', `#${ctx.vista}`); render(); }
+  else if (vista) ctx.irPara(vista.dataset.vista);
+  else if (ev.target.closest('[data-rapido]')) {
+    const r = ev.target.closest('[data-rapido]').dataset.rapido;
+    const f = ctx.filtro;
+    if (r === 'minhas') f.responsavel = f.responsavel === ctx.usuarioNome() ? '' : ctx.usuarioNome();
+    if (r === 'atrasadas') f.prazo = f.prazo === 'atrasado' ? '' : 'atrasado';
+    if (r === 'bloqueadas') f.bloqueio = f.bloqueio ? '' : 'bloqueadas';
+    if (r === 'paradas') f.parada = f.parada ? '' : '5';
+    render();
+  }
   else if (ev.target.closest('[data-alternar-lateral]')) document.body.classList.toggle('lateral-aberta');
 });
 
@@ -287,6 +317,7 @@ document.addEventListener('keydown', (ev) => {
   const ctrl = ev.ctrlKey || ev.metaKey;
   if (ctrl && !digitando && ev.key.toLowerCase() === 'z' && !ev.shiftKey) { ev.preventDefault(); acoes.desfazer(); return; }
   if (ctrl && !digitando && (ev.key.toLowerCase() === 'y' || (ev.key.toLowerCase() === 'z' && ev.shiftKey))) { ev.preventDefault(); acoes.refazer(); return; }
+  if (ctrl && ev.key.toLowerCase() === 'k') { ev.preventDefault(); if (!$('#dialogo').open) abrirComandos(ctx, acoes); return; }
   if (digitando || ctrl || ev.altKey || $('#dialogo').open) return;
   if (ev.key === '/') { ev.preventDefault(); $('#busca').focus(); }
   else if (ev.key === '?') dialogoAtalhos();
@@ -295,7 +326,8 @@ document.addEventListener('keydown', (ev) => {
     render();
     $('[data-novo-card]')?.click();
     ev.preventDefault();
-  } else if (['1', '2', '3', '4'].includes(ev.key)) { ctx.vista = VISTAS[Number(ev.key) - 1]; history.replaceState(null, '', `#${ctx.vista}`); render(); }
+  } else if (['1', '2', '3', '4', '5'].includes(ev.key)) ctx.irPara(VISTAS[Number(ev.key) - 1]);
+  else if (ev.key.toLowerCase() === 'm') { ctx.filtro.responsavel = ctx.filtro.responsavel === ctx.usuarioNome() ? '' : ctx.usuarioNome(); render(); }
 });
 
 window.addEventListener('storage', (ev) => {

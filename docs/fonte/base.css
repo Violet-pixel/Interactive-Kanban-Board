@@ -1,0 +1,136 @@
+/* Prumo · base dos manuais em PDF (WeasyPrint)
+   Mesma identidade da interface: papel milimetrado, tinta grafite, azul da linha de giz para ação e latão do prumo
+   para destaque. Mesmas fontes do Lume: Literata (títulos), Public Sans (texto) e IBM Plex Mono (código e números). */
+@font-face { font-family: "Public Sans"; font-weight: 100 900; src: url("../../web/fonts/public-sans-latin-wght-normal.woff2"); }
+@font-face { font-family: "Public Sans"; font-weight: 100 900; src: url("../../web/fonts/public-sans-latin-ext-wght-normal.woff2"); unicode-range: U+0100-02BA, U+1E00-1E9F, U+20A0-20C0; }
+@font-face { font-family: "Literata"; font-weight: 400; src: url("fontes/Literata-Regular.ttf"); }
+@font-face { font-family: "Literata"; font-weight: 600; src: url("fontes/Literata-SemiBold.ttf"); }
+@font-face { font-family: "Literata"; font-style: italic; font-weight: 400; src: url("fontes/Literata-Italic.ttf"); }
+@font-face { font-family: "Plex Mono"; font-weight: 400; src: url("../../web/fonts/ibm-plex-mono-latin-400-normal.woff2"); }
+@font-face { font-family: "Plex Mono"; font-weight: 500; src: url("../../web/fonts/ibm-plex-mono-latin-500-normal.woff2"); }
+@font-face { font-family: "Plex Mono"; font-weight: 600; src: url("../../web/fonts/ibm-plex-mono-latin-600-normal.woff2"); }
+@font-face { font-family: "Plex Mono"; font-style: italic; font-weight: 400; src: url("../../web/fonts/ibm-plex-mono-latin-400-italic.woff2"); }
+
+:root {
+  --papel: #F2F3EF; --papel-2: #E7E9E3; --folha: #FFFFFF;
+  --ink: #1C2126; --ink-2: #434B53; --muted: #646C74;
+  --line: #DCE0DA; --line-strong: #C3C9C2;
+  --acao: #2251A3; --acao-claro: #5B83C6; --acao-soft: #E3EAF6;
+  --latao: #B07D24; --latao-soft: #F3E7CB; --latao-ink: #5C410C;
+  --ok: #3F7A3A; --ok-soft: #E2EFDF;
+  --font: "Public Sans", sans-serif;
+  --serif: "Literata", Georgia, serif;
+  --mono: "Plex Mono", "DejaVu Sans Mono", monospace;
+}
+
+@page {
+  size: A4;
+  margin: 22mm 20mm 22mm 24mm;
+  @top-left { content: "Prumo, " string(doc-title); font: 600 8pt var(--serif); color: var(--ink); vertical-align: bottom; padding-bottom: 4mm; }
+  @top-right { content: string(chapter); font: 400 7.4pt var(--font); color: var(--muted); vertical-align: bottom; padding-bottom: 4mm; }
+  @bottom-left { content: string(doc-version); font: 400 7pt var(--font); color: var(--muted); }
+  @bottom-right { content: counter(page); font: 600 8pt var(--font); color: var(--ink); }
+}
+@page :first { margin: 0; @top-left { content: none; } @top-right { content: none; } @bottom-left { content: none; } @bottom-right { content: none; } }
+@page chapter { @top-right { content: none; } }
+
+html { font-family: var(--font); font-size: 9.4pt; line-height: 1.55; color: var(--ink); }
+body { margin: 0; }
+.doc-title { string-set: doc-title content(); }
+.doc-version { string-set: doc-version content(); }
+.doc-title, .doc-version { position: absolute; left: -200mm; top: 0; font-size: 1pt; color: transparent; }
+
+h1, h2, h3, h4 { font-family: var(--serif); font-weight: 600; color: var(--ink); letter-spacing: -0.01em; line-height: 1.2; break-after: avoid; }
+h2 { font-size: 17pt; margin: 0 0 4mm; string-set: chapter content(); }
+h3 { font-size: 12.5pt; margin: 7mm 0 2.5mm; }
+h4 { font-family: var(--font); font-size: 9.6pt; font-weight: 650; margin: 5mm 0 1.5mm; letter-spacing: 0; }
+p { margin: 0 0 2.6mm; orphans: 3; widows: 3; }
+a { color: var(--acao); text-decoration: none; }
+strong, b { font-weight: 650; }
+code, kbd, .mono { font-family: var(--mono); font-size: 0.86em; }
+code { background: var(--papel); padding: 0.05em 0.3em; border-radius: 2px; color: var(--ink); }
+kbd { border: 0.6pt solid var(--line-strong); border-bottom-width: 1.2pt; border-radius: 2px; padding: 0 0.35em; background: #fff; }
+pre { font-family: var(--mono); font-size: 7.6pt; line-height: 1.5; background: var(--papel); border-left: 2pt solid var(--acao); padding: 3mm 4mm; margin: 2mm 0 4mm; white-space: pre-wrap; break-inside: avoid; border-radius: 0 2mm 2mm 0; }
+pre code { background: none; padding: 0; font-size: inherit; }
+ul, ol { margin: 0 0 3mm; padding-left: 5mm; }
+li { margin-bottom: 1.2mm; }
+li::marker { color: var(--acao); }
+
+/* Abertura de capítulo: lombada colorida e número do capítulo */
+.chapter { page: chapter; break-before: page; }
+.chapter-head { position: relative; padding-left: 7mm; margin-bottom: 8mm; }
+.chapter-head::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2.4mm; background: var(--acao); border-radius: 0.6mm; }
+.chapter-head .num { font: 600 8pt var(--font); color: var(--acao); }
+.chapter-head h2 { font-size: 26pt; margin: 1mm 0 2mm; letter-spacing: -0.02em; }
+.chapter-head .lede { font-family: var(--serif); font-size: 11pt; line-height: 1.5; color: var(--ink-2); max-width: 135mm; }
+
+/* Tabelas */
+table { width: 100%; border-collapse: collapse; margin: 2mm 0 5mm; font-size: 8.2pt; line-height: 1.4; }
+thead { display: table-header-group; }
+tr { break-inside: avoid; }
+th { font: 650 7.6pt var(--font); color: var(--ink-2); text-align: left; padding: 1.8mm 2mm; border-bottom: 0.9pt solid var(--ink); background: var(--papel); }
+td { padding: 1.6mm 2mm; border-bottom: 0.5pt solid var(--line); vertical-align: top; }
+td code { font-size: 0.92em; }
+
+/* Notas */
+.note { border-left: 2pt solid var(--acao-claro); background: var(--acao-soft); padding: 2.5mm 4mm; margin: 3mm 0 4mm; break-inside: avoid; border-radius: 0 2mm 2mm 0; }
+.note.tip { border-color: var(--ok); background: var(--ok-soft); }
+.note.warn { border-color: var(--latao); background: var(--latao-soft); }
+.note b.t { display: block; margin-bottom: 0.8mm; }
+
+/* Figuras */
+figure { margin: 3mm 0 5mm; break-inside: avoid; }
+figure img { width: 100%; border: 0.6pt solid var(--line-strong); border-radius: 1.4mm; display: block; }
+figcaption { font-size: 7.8pt; color: var(--muted); margin-top: 1.6mm; }
+figcaption b { color: var(--acao); margin-right: 1mm; }
+figure.narrow { width: 70%; margin-left: auto; margin-right: auto; }
+.fig-pair { display: flex; gap: 5mm; break-inside: avoid; margin: 3mm 0 5mm; }
+.fig-pair figure { flex: 1; margin: 0; }
+
+/* Sumário */
+.toc-page { break-after: page; }
+.toc-page h2 { font-size: 26pt; margin: 0 0 6mm; string-set: chapter "Sumário"; }
+.toc ol { list-style: none; padding: 0; margin: 0; }
+.toc { columns: 2; column-gap: 9mm; font-size: 8pt; }
+.toc li { margin: 0; border-bottom: 0.5pt solid var(--line); padding: 0.85mm 0; }
+.toc li.ch { font-family: var(--serif); font-weight: 600; font-size: 9.2pt; border-bottom: 0.8pt solid var(--ink); padding-top: 2.6mm; break-after: avoid; }
+.toc li.ch .n { font-family: var(--font); font-size: 7.6pt; color: var(--acao); margin-right: 2mm; }
+.toc li.sub { padding-left: 6mm; color: var(--ink-2); }
+.toc a { color: inherit; }
+.toc a::after { content: target-counter(attr(href), page); float: right; font: 600 7.8pt var(--font); color: var(--muted); }
+
+/* Capa: papel milimetrado com o fio de prumo */
+.cover { position: relative; width: 210mm; height: 297mm; background-color: var(--papel); background-image: linear-gradient(#E1E5DE 0.3pt, transparent 0.3pt), linear-gradient(90deg, #E1E5DE 0.3pt, transparent 0.3pt); background-size: 6mm 6mm; overflow: hidden; page-break-after: always; color: var(--ink); }
+.cover .plumb { position: absolute; left: 160mm; top: 0; width: 26mm; height: 150mm; }
+.cover .cols { position: absolute; left: 24mm; right: 22mm; top: 168mm; display: flex; gap: 3mm; }
+.cover .cols .col { flex: 1; background: rgba(255,255,255,.75); border: 0.6pt solid var(--line-strong); border-radius: 1.6mm; padding: 2.5mm; min-height: 62mm; }
+.cover .cols .col b { display: block; font: 600 9pt var(--serif); margin-bottom: 2mm; }
+.cover .cols .col i { display: block; height: 9mm; background: #fff; border: 0.5pt solid var(--line-strong); border-left: 1.4mm solid var(--c, #2251A3); border-radius: 1mm; margin-bottom: 1.6mm; }
+.cover .mark { position: absolute; left: 24mm; top: 26mm; width: 16mm; height: 16mm; }
+.cover .mark svg { width: 16mm; height: 16mm; }
+.cover h1 { position: absolute; left: 22mm; top: 50mm; margin: 0; font: 600 104pt/1 var(--serif); letter-spacing: -0.04em; color: var(--ink); string-set: none; }
+.cover .sub { position: absolute; left: 24mm; top: 96mm; font: italic 400 21pt/1.2 var(--serif); color: var(--ink-2); }
+.cover .desc { position: absolute; left: 24mm; top: 112mm; width: 120mm; font: 400 10pt/1.55 var(--font); color: var(--ink-2); }
+.cover .shelf { position: absolute; left: 24mm; right: 22mm; top: 168mm; height: 72mm; display: flex; align-items: flex-end; gap: 1mm; padding: 0 4mm; background: #E6E1DB; border-radius: 1.5mm 1.5mm 0 0; }
+.cover .shelf span { display: block; border-radius: 0.5mm 0.5mm 0 0; position: relative; }
+.cover .shelf span::before { content: ""; position: absolute; left: 0; right: 0; top: 3mm; height: 0.7mm; background: rgba(255,255,255,.55); }
+.cover .shelf span::after { content: ""; position: absolute; left: 0; right: 0; bottom: 6mm; height: 0.7mm; background: rgba(255,255,255,.55); }
+.cover .plank { position: absolute; left: 24mm; right: 22mm; top: 240mm; height: 4mm; background: #A89A8C; border-radius: 0 0 1.2mm 1.2mm; }
+.cover .foot { position: absolute; left: 24mm; right: 22mm; bottom: 18mm; border-top: 0.6pt solid var(--ink); padding-top: 3mm; display: flex; justify-content: space-between; font-size: 8pt; color: var(--ink-2); }
+.cover .foot .author { font: 600 11pt var(--serif); color: var(--ink); }
+.cover .foot .right { text-align: right; line-height: 1.7; }
+
+/* Utilitários */
+.group-title { font: 650 8.4pt var(--font); color: var(--acao); margin: 5mm 0 1mm; break-after: avoid; }
+.tag { display: inline-block; font: 600 6.8pt var(--font); padding: 0.2mm 1.6mm; border-radius: 4mm; background: var(--acao-soft); color: var(--acao); vertical-align: 0.3mm; }
+.tag.new { background: var(--latao); color: var(--ink); }
+.page-break { break-before: page; }
+.diagram { margin: 2mm 0 5mm; break-inside: avoid; }
+.diagram img, .diagram svg { width: 100%; height: auto; }
+table.routes td:first-child { width: 34%; font-family: var(--mono); font-size: 7.4pt; color: var(--acao); }
+table.cfg td:first-child { width: 28%; font-family: var(--mono); font-size: 7.4pt; }
+table.cfg td:nth-child(2) { width: 18%; font-family: var(--mono); font-size: 7.4pt; color: var(--ink-2); }
+dl.def { margin: 2mm 0 4mm; }
+dl.def .item { display: flex; gap: 4mm; padding: 1.6mm 0; border-bottom: 0.5pt solid var(--line); break-inside: avoid; }
+dl.def dt { width: 36mm; flex: none; font-weight: 650; }
+dl.def dd { margin: 0; flex: 1; color: var(--ink-2); }

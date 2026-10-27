@@ -1,7 +1,15 @@
 import { normalizar, inicioDoDia, lerDataLocal } from './util.js';
-import { estaConcluido } from './regras.js';
+import { estaConcluido, dependenciasPendentes } from './regras.js';
 
-export const FILTRO_VAZIO = { texto: '', responsavel: '', etiqueta: '', prioridade: '', prazo: '', colunaId: '' };
+export const FILTRO_VAZIO = { texto: '', responsavel: '', etiqueta: '', prioridade: '', prazo: '', colunaId: '', bloqueio: '', parada: '' };
+
+/** Dias desde que a tarefa entrou na coluna atual (ou desde que foi criada). */
+export const diasNaColuna = (card, hoje = new Date()) => {
+  const ultimo = [...(card.movimentos ?? [])].reverse().find((m) => m.para === card.colunaId);
+  const desde = ultimo?.em ?? card.criadoEm;
+  if (!desde) return 0;
+  return Math.max(0, Math.floor((inicioDoDia(hoje) - inicioDoDia(desde)) / 86400000));
+};
 
 export const situacaoPrazo = (quadro, card, hoje = new Date()) => {
   if (!card.prazo) return 'sem';
@@ -30,6 +38,8 @@ export const atendeFiltro = (quadro, card, filtro, hoje = new Date()) => {
   if (filtro.etiqueta && !card.etiquetas.includes(filtro.etiqueta)) return false;
   if (filtro.prioridade && card.prioridade !== filtro.prioridade) return false;
   if (filtro.colunaId && card.colunaId !== filtro.colunaId) return false;
+  if (filtro.bloqueio === 'bloqueadas' && (estaConcluido(quadro, card) || !dependenciasPendentes(quadro, card).length)) return false;
+  if (filtro.parada && (estaConcluido(quadro, card) || diasNaColuna(card, hoje) < Number(filtro.parada))) return false;
   if (filtro.prazo) {
     const s = situacaoPrazo(quadro, card, hoje);
     if (filtro.prazo === 'atrasado' && s !== 'atrasado') return false;

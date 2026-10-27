@@ -1,0 +1,16 @@
+{
+  "theme": "base",
+  "themeVariables": {
+    "fontFamily": "Public Sans, Arial, sans-serif",
+    "fontSize": "18px",
+    "primaryColor": "#FFFFFF",
+    "primaryTextColor": "#1C2126",
+    "primaryBorderColor": "#2251A3",
+    "lineColor": "#646C74",
+    "secondaryColor": "#E3EAF6",
+    "tertiaryColor": "#F2F3EF",
+    "attributeBackgroundColorOdd": "#FFFFFF",
+    "attributeBackgroundColorEven": "#F2F3EF"
+  },
+  "er": { "layoutDirection": "LR", "useMaxWidth": false, "entityPadding": 12, "minEntityWidth": 120 }
+}

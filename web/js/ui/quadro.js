@@ -1,18 +1,24 @@
 import { html, seguro, icone, avisar, $, $$, pedirTexto, confirmar, abrirDialogo, corExibida } from './dom.js';
 import { cardsDaColuna, moverCard, adicionarCard, adicionarColuna, moverColuna, excluirColuna, progressoSubtarefas, dependenciasPendentes, estaConcluido, colunaDe, registrar } from '../regras.js';
-import { atendeFiltro, situacaoPrazo, filtroAtivo } from '../filtros.js';
-import { formatarData, nomePrioridade } from '../util.js';
+import { atendeFiltro, situacaoPrazo, filtroAtivo, diasNaColuna } from '../filtros.js';
+import { interpretarEntrada } from '../entrada.js';
+import { formatarData, nomePrioridade, normalizar } from '../util.js';
 import { pode } from '../permissoes.js';
 
 export const iniciais = (nome) => String(nome || '?').split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0].toUpperCase()).join('');
 
 const ROTULO_PRAZO = { atrasado: 'Atrasada', hoje: 'Hoje', semana: '', futuro: '', concluido: '', sem: '' };
 
-export const htmlCard = (quadro, card, podeMover) => {
+export const htmlCard = (quadro, card, podeMover, eu = '') => {
   const etiquetas = card.etiquetas.map((id) => quadro.etiquetas.find((e) => e.id === id)).filter(Boolean);
   const prog = progressoSubtarefas(card);
   const prazo = situacaoPrazo(quadro, card);
-  const bloqueado = !estaConcluido(quadro, card) && dependenciasPendentes(quadro, card).length > 0;
+  const concluido = estaConcluido(quadro, card);
+  const bloqueado = !concluido && dependenciasPendentes(quadro, card).length > 0;
+  const parada = concluido ? 0 : diasNaColuna(card);
+  const ic = quadro.colunas.findIndex((c) => c.id === card.colunaId);
+  const proxima = quadro.colunas[ic + 1];
+  const minha = eu && normalizar(card.responsavel) === normalizar(eu);
   return html`<article class="card prioridade-${card.prioridade} ${bloqueado ? 'card-bloqueado' : ''}" data-card="${card.id}" draggable="${podeMover ? 'true' : 'false'}" tabindex="0" aria-label="${card.titulo}">
     ${etiquetas.length ? html`<div class="card-etiquetas">${etiquetas.map((e) => html`<span class="etiqueta" style="--cor:${corExibida(e.cor)}">${e.nome}</span>`)}</div>` : ''}
     <h3 class="card-titulo">${card.titulo}</h3>
@@ -22,10 +28,12 @@ export const htmlCard = (quadro, card, podeMover) => {
       ${card.comentarios.length ? html`<span class="selo" title="Comentários">${icone('balao')}${card.comentarios.length}</span>` : ''}
       ${card.anexos.length ? html`<span class="selo" title="Anexos">${icone('clipe')}${card.anexos.length}</span>` : ''}
       ${bloqueado ? html`<span class="selo selo-alerta" title="Depende de tarefas não concluídas">${icone('elo')}Bloqueada</span>` : ''}
+      ${parada >= 5 ? html`<span class="selo selo-parada ${parada >= 10 ? 'parada-longa' : ''}" title="Dias nesta coluna sem sair do lugar">${icone('ampulheta')}${parada} d parada</span>` : ''}
     </div>
     ${prog.total ? html`<div class="progresso" aria-hidden="true"><span style="width:${prog.percentual}%"></span></div>` : ''}
     <div class="card-rodape">
       <span class="prioridade">${nomePrioridade(card.prioridade)}</span>
+      ${podeMover ? html`<span class="card-rapido">${!minha && eu ? html`<button type="button" class="rapido" data-assumir="${card.id}" title="Ficar com esta tarefa">${icone('mao')}<span>Assumir</span></button>` : ''}${proxima ? html`<button type="button" class="rapido" data-avancar="${card.id}" title="Mover para ${proxima.nome}">${icone('seta')}<span>${proxima.nome}</span></button>` : ''}</span>` : ''}
       ${card.responsavel ? html`<span class="avatar" title="${card.responsavel}">${iniciais(card.responsavel)}</span>` : html`<span class="avatar avatar-vazio" title="Sem responsável">?</span>`}
     </div>
   </article>`;
@@ -52,20 +60,29 @@ export const renderizarQuadro = (alvo, ctx) => {
   const podeTarefas = pode(papel, 'tarefas');
   const podeColunas = pode(papel, 'colunas');
   const filtrando = filtroAtivo(filtro);
+  const recolhidas = loja.estado.preferencias.recolhidas?.[quadro.id] ?? [];
+  const eu = ctx.usuarioNome?.() ?? '';
   alvo.innerHTML = html`<div class="quadro" style="--cor-quadro:${corExibida(quadro.cor)}">
     ${quadro.colunas.map((col) => {
       const todos = cardsDaColuna(quadro, col.id);
       const visiveis = todos.filter((c) => atendeFiltro(quadro, c, filtro));
       const cheio = col.limiteWip && todos.length >= col.limiteWip;
+      if (recolhidas.includes(col.id)) {
+        return html`<section class="coluna coluna-recolhida coluna-${col.tipo} ${cheio ? 'coluna-lotada' : ''}" data-coluna="${col.id}">
+          <button class="recolhida-botao" data-expandir="${col.id}" title="Mostrar a coluna ${col.nome}" aria-label="Mostrar a coluna ${col.nome}">${icone('expandir')}<span class="recolhida-nome">${col.nome}</span><span class="contador">${todos.length}${col.limiteWip ? `/${col.limiteWip}` : ''}</span></button>
+          <div class="coluna-lista" data-lista="${col.id}" hidden></div>
+        </section>`;
+      }
       return html`<section class="coluna coluna-${col.tipo}" data-coluna="${col.id}">
         <header class="coluna-topo" draggable="${podeColunas ? 'true' : 'false'}" data-arrastar-coluna="${col.id}">
+          <button class="botao-icone pequeno recolher" data-recolher="${col.id}" aria-label="Recolher a coluna ${col.nome}" title="Recolher">${icone('recolher')}</button>
           <h2 class="coluna-nome" title="${TIPOS[col.tipo]}">${col.nome}</h2>
           <span class="contador ${cheio ? 'contador-cheio' : ''}" title="${col.limiteWip ? 'Tarefas / limite WIP' : 'Tarefas'}">${filtrando ? `${visiveis.length} de ` : ''}${todos.length}${col.limiteWip ? `/${col.limiteWip}` : ''}</span>
           ${podeColunas ? html`<button class="botao-icone pequeno" data-menu-coluna="${col.id}" aria-label="Opções da coluna ${col.nome}">${icone('pontos')}</button>` : ''}
           ${htmlNivel(todos.length, col.limiteWip)}
         </header>
         <div class="coluna-lista" data-lista="${col.id}">
-          ${visiveis.map((c) => htmlCard(quadro, c, podeTarefas))}
+          ${visiveis.map((c) => htmlCard(quadro, c, podeTarefas, eu))}
           ${!visiveis.length ? html`<p class="coluna-vazia">${filtrando ? 'Nada com esses filtros' : 'Arraste tarefas para cá'}</p>` : ''}
         </div>
         ${podeTarefas ? html`<button class="botao-adicionar" data-novo-card="${col.id}">${icone('mais')}Adicionar tarefa</button>` : ''}
@@ -134,6 +151,7 @@ const ligarEventos = (alvo, ctx) => {
     if (!arrastando) return;
     if (arrastando.tipo === 'card') {
       const lista = ev.target.closest('[data-lista]') ?? ev.target.closest('.coluna')?.querySelector('[data-lista]');
+      // coluna recolhida: aceita a tarefa no fim da lista
       if (!lista) return;
       ev.preventDefault();
       const q = loja.quadro;
@@ -180,6 +198,37 @@ const ligarEventos = (alvo, ctx) => {
   });
 
   alvo.addEventListener('click', async (ev) => {
+    const recolher = ev.target.closest('[data-recolher], [data-expandir]');
+    if (recolher) {
+      const id = recolher.dataset.recolher ?? recolher.dataset.expandir;
+      const todas = { ...(loja.estado.preferencias.recolhidas ?? {}) };
+      const atual = new Set(todas[loja.quadro.id] ?? []);
+      if (recolher.dataset.recolher) atual.add(id); else atual.delete(id);
+      todas[loja.quadro.id] = [...atual];
+      loja.preferencia('recolhidas', todas);
+      return;
+    }
+    const avancar = ev.target.closest('[data-avancar]');
+    const assumir = ev.target.closest('[data-assumir]');
+    if (avancar) {
+      const q = loja.quadro;
+      const c = q.cards.find((x) => x.id === avancar.dataset.avancar);
+      const ic = q.colunas.findIndex((x) => x.id === c.colunaId);
+      const destino = q.colunas[ic + 1];
+      if (destino) executarMovimento(ctx, c.id, destino.id, cardsDaColuna(q, destino.id).length);
+      return;
+    }
+    if (assumir) {
+      const eu = ctx.usuarioNome();
+      loja.alterarQuadro('assumir tarefa', (q, autor) => {
+        const c = q.cards.find((x) => x.id === assumir.dataset.assumir);
+        c.responsavel = eu;
+        registrar(q, autor, 'atribuiu', `${c.titulo} a ${eu}`, c.id);
+        return { ok: true };
+      });
+      avisar('A tarefa agora é sua.');
+      return;
+    }
     const card = ev.target.closest('.card');
     const novoCard = ev.target.closest('[data-novo-card]');
     const menu = ev.target.closest('[data-menu-coluna]');
@@ -221,7 +270,7 @@ const abrirNovoCardInline = (botao, ctx) => {
   const colunaId = botao.dataset.novoCard;
   const form = document.createElement('form');
   form.className = 'novo-card';
-  form.innerHTML = html`<textarea id="novo-card-${colunaId}" rows="2" placeholder="Título da tarefa" maxlength="200" required></textarea><div class="linha"><button class="botao botao-primario pequeno">Adicionar</button><button type="button" class="botao pequeno" data-cancelar>Cancelar</button></div>`;
+  form.innerHTML = html`<textarea id="novo-card-${colunaId}" rows="2" placeholder="Título da tarefa" maxlength="200" required aria-describedby="dica-${colunaId}"></textarea><div class="previa" aria-live="polite"></div><p class="dica" id="dica-${colunaId}"><kbd>@</kbd>pessoa <kbd>#</kbd>etiqueta <kbd>!</kbd>alta <kbd>&gt;</kbd>sexta</p><div class="linha"><button class="botao botao-primario pequeno">Adicionar</button><button type="button" class="botao pequeno" data-cancelar>Cancelar</button></div>`;
   botao.replaceWith(form);
   const campo = form.querySelector('textarea');
   campo.focus();
@@ -231,11 +280,23 @@ const abrirNovoCardInline = (botao, ctx) => {
     if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); form.requestSubmit(); }
     if (ev.key === 'Escape') cancelar();
   });
+  const previa = form.querySelector('.previa');
+  campo.addEventListener('input', () => {
+    const r = interpretarEntrada(campo.value, ctx.loja.quadro);
+    const et = r.etiquetas.map((id) => ctx.loja.quadro.etiquetas.find((e) => e.id === id)?.nome);
+    previa.innerHTML = html`${r.responsavel ? html`<span class="chip-previa">${icone('usuario')}${r.responsavel}</span>` : ''}${et.map((n) => html`<span class="chip-previa">#${n}</span>`)}${r.prioridade ? html`<span class="chip-previa">${nomePrioridade(r.prioridade)}</span>` : ''}${r.prazo ? html`<span class="chip-previa">${icone('relogio')}${formatarData(r.prazo)}</span>` : ''}${r.avisos.map((a) => html`<span class="chip-previa chip-aviso">${a}</span>`)}`;
+  });
   form.addEventListener('submit', (ev) => {
     ev.preventDefault();
-    const titulo = campo.value.trim();
-    if (!titulo) return;
-    const r = ctx.loja.alterarQuadro('criar tarefa', (q, autor) => adicionarCard(q, { colunaId, titulo }, autor));
+    const entrada = interpretarEntrada(campo.value, ctx.loja.quadro);
+    const titulo = entrada.titulo;
+    if (!titulo) { avisar('Escreva o título da tarefa.', 'alerta'); return; }
+    const dados = { colunaId, titulo };
+    if (entrada.responsavel) dados.responsavel = entrada.responsavel;
+    if (entrada.prioridade) dados.prioridade = entrada.prioridade;
+    if (entrada.etiquetas.length) dados.etiquetas = entrada.etiquetas;
+    if (entrada.prazo) dados.prazo = entrada.prazo;
+    const r = ctx.loja.alterarQuadro('criar tarefa', (q, autor) => adicionarCard(q, dados, autor));
     if (r.ok === false) { avisar(r.erro, 'erro'); return; }
     r.avisos?.forEach((a) => avisar(a));
     requestAnimationFrame(() => $(`[data-novo-card="${colunaId}"]`)?.click());
