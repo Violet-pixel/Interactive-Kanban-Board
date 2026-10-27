@@ -31,7 +31,7 @@ export const corExibida = (cor) => CORES_1_1[String(cor ?? '').toUpperCase()]?.[
 
 export const nomeCor = (cor) => CORES_1_1[String(cor ?? '').toUpperCase()]?.[1] ?? cor;
 
-export const LOGO = '<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6v32" stroke="currentColor" stroke-width="4"/><rect x="37" y="36" width="26" height="9" rx="2" fill="currentColor"/><path d="M33 48h34L50 94Z" fill="var(--latao, #B07D24)"/><path d="M50 48v46" stroke="currentColor" stroke-width="2" opacity=".3"/></svg>';
+export const LOGO = '<svg viewBox="0 0 100 100" aria-hidden="true"><g transform="translate(50 50) scale(0.62) translate(-50 -50)" fill="currentColor"><path d="M50 10v30" stroke="currentColor" stroke-width="4"/><rect x="38" y="38" width="24" height="8"/><path d="M34 48h32L50 90Z"/></g></svg>';
 
 export const ICONES = {
   desfazer: '<svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>',

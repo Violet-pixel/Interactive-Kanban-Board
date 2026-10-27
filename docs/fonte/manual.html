@@ -40,8 +40,8 @@
 <span class="doc-title">manual de uso e instalação</span><span class="doc-version">Versão 1.1.0, interface de outubro de 2026</span>
 
 <div class="cover">
-  <svg class="plumb" viewBox="0 0 26 150"><path d="M13 0v104" stroke="#1C2126" stroke-width="0.8"/><rect x="7.5" y="102" width="11" height="4" rx="1" fill="#1C2126"/><path d="M5.5 107h15L13 140Z" fill="#B07D24"/></svg>
-  <div class="mark"><svg viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#1C2126"/><path d="M50 10v30" stroke="#E7E9E3" stroke-width="4"/><rect x="38" y="38" width="24" height="8" rx="2" fill="#E7E9E3"/><path d="M34 48h32L50 90Z" fill="#C99536"/></svg></div>
+  <svg class="plumb" viewBox="0 0 26 150"><path d="M13 0v104" stroke="#1C2126" stroke-width="0.8"/><rect x="7.5" y="102" width="11" height="4" rx="1" fill="#1C2126"/><path d="M5.5 107h15L13 140Z" fill="#000000"/></svg>
+  <div class="mark"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#000000"/><g transform="translate(50 50) scale(0.58) translate(-50 -50)" fill="#FFFFFF"><path d="M50 10v30" stroke="#FFFFFF" stroke-width="4"/><rect x="38" y="38" width="24" height="8"/><path d="M34 48h32L50 90Z"/></g></svg></div>
   <h1>Prumo</h1>
   <div class="sub">Manual de uso e instalação</div>
   <div class="desc">Quadro Kanban interativo em JavaScript, com API REST em Django, colaboração em tempo real, automações, limites WIP e métricas de fluxo.</div>
@@ -102,7 +102,7 @@
   <div class="chapter-head"><div class="num">Capítulo 1</div><h2>Novidades da interface</h2>
     <p class="lede">Esta rodada mexe só na interface. A API, o formato JSON e o banco são os mesmos da 1.1.0, então quadros exportados antes abrem sem conversão.</p></div>
   <ul>
-    <li><b>Mesa de obra.</b> O quadro fica sobre papel milimetrado; cada coluna é uma raia com cantos arredondados e as tarefas são fichas brancas com o título em Literata. O logo virou um prumo de pedreiro, com o peso em latão.</li>
+    <li><b>Mesa de obra.</b> O quadro fica sobre papel milimetrado; cada coluna é uma raia com cantos arredondados e as tarefas são fichas brancas com o título em Literata. O logo virou um prumo de pedreiro em branco sobre um quadrado preto.</li>
     <li><b>Tipografia do Lume.</b> Literata nos títulos e nas tarefas, Public Sans na interface e IBM Plex Mono nos números (contagens, limite WIP, dias na coluna), no lugar da Schibsted Grotesk e da Source Serif 4.</li>
     <li><b>Adição rápida.</b> Ao criar uma tarefa, <code>@ana #bug !alta &gt;sexta</code> já preenche responsável, etiqueta, prioridade e prazo, com uma prévia antes de salvar (seção 4.4).</li>
     <li><b>Filtros rápidos.</b> Os cinco seletores viraram botões de um clique, cada um com a contagem: Minhas tarefas, Atrasadas, Bloqueadas e Paradas há 5 dias. Os filtros completos ficam em Mais filtros (seção 4.8).</li>
@@ -140,7 +140,7 @@
   </div>
 
   <h3 id="s-identidade">Identidade visual</h3>
-  <p>O nome vem do prumo de pedreiro, o peso na ponta de um fio que mostra o que está alinhado. A interface é uma mesa de obra: papel milimetrado sob o quadro, tinta grafite, o azul da linha de giz para ações e foco e o latão do prumo para destaques. O limite WIP de cada coluna é um nível de bolha.</p>
+  <p>O nome vem do prumo de pedreiro, o peso na ponta de um fio que mostra o que está alinhado. A interface é uma mesa de obra: papel milimetrado sob o quadro, tinta grafite, o azul da linha de giz para ações e foco e o latão para destaques. O logo é sempre em preto e branco: o prumo em branco dentro de um quadrado preto, sem cantos arredondados. O limite WIP de cada coluna é um nível de bolha.</p>
   <div class="swatches">
     <div class="sw"><div class="chip" style="background:#F2F3EF"></div><b>Papel</b><span class="hex">#F2F3EF</span>Fundo e grade</div>
     <div class="sw"><div class="chip" style="background:#1C2126"></div><b>Grafite</b><span class="hex">#1C2126</span>Texto e logo</div>

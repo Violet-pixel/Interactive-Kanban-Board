@@ -25,7 +25,7 @@ Feito com JavaScript (módulos ES e Drag and Drop nativo), HTML5 e CSS3 na inter
 
 Esta rodada mexe só na interface. API, formato JSON e banco continuam iguais aos da 1.1.0.
 
-- Mesa de obra: o quadro fica sobre papel milimetrado, cada coluna é uma raia e as tarefas são fichas com o título em Literata. O logo virou um prumo de pedreiro.
+- Mesa de obra: o quadro fica sobre papel milimetrado, cada coluna é uma raia e as tarefas são fichas com o título em Literata. O logo virou um prumo de pedreiro em branco sobre um quadrado preto.
 - Tipografia igual à do Lume: Literata nos títulos e nas tarefas, Public Sans na interface e IBM Plex Mono nos números.
 - Adição rápida: `Revisar contrato @ana #bug !alta >sexta` já preenche responsável, etiqueta, prioridade e prazo, com prévia antes de salvar.
 - Filtros rápidos com contagem (Minhas tarefas, Atrasadas, Bloqueadas, Paradas há 5 dias) no lugar dos cinco seletores; o resto fica em Mais filtros.
